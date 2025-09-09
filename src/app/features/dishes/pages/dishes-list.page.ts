@@ -9,7 +9,6 @@ import { AsyncPipe } from '@angular/common';
   template: `
     <h1>Dishes</h1>
 
-    <button (click)="seed()">Add Kebab</button>
 
     @if (dishes$ | async; as dishes) {
       @if (dishes.length > 0) {
@@ -36,5 +35,4 @@ export class DishesListPage {
   private svc = inject(DishesService);
   dishes$ = this.svc.list$();
 
-  seed() { this.svc.addKebab(); }
 }

@@ -13,17 +13,5 @@ export class DishesService {
     return collectionData(q, { idField: 'id' }) as Observable<Dish[]>;
   }
 
-  /** demo seed */
-  addKebab() {
-    const kebab: Dish = {
-      name: 'Kebab',
-      description: 'Juicy grilled kebab with herbs',
-      popularity: 2.4,
-      isPublic: true,
-      createdAt: Date.now()
-    };
-    return addDoc(this.col, kebab).then(ref => {
-        console.log('Created dish with ID:', ref.id);
-    });
-  }
+
 }
