@@ -5,4 +5,5 @@ export interface Dish {
   popularity?: number;   // configurable at runtime
   isPublic?: boolean;
   createdAt: number;     // Date.now()
+  ownerId?: string;
 }
