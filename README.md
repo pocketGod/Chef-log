@@ -11,7 +11,7 @@ Rules (MVP):
 
 Segment 'vegans' → allow only diet === 'vegan'
 
-Segment 'vegetarians' → allow diet !== 'meat'
+Segment 'vegeterians' → allow diet !== 'meat'
 
 Segment 'kids' → if kidFriendly === false then 0, else 1
 

@@ -64,7 +64,7 @@ export class EventEditorPage {
           if (t === 'adult' || t === 'adults') return 'adult';
           if (t === 'kid' || t === 'kids') return 'kid';
           if (t === 'vegan' || t === 'vegans') return 'vegan';
-          if (t === 'vegeterian' || t === 'vegetarian' || t === 'veg') return 'vegeterian';
+          if (t === 'vegeterian' || t === 'veg') return 'vegeterian';
           return 'adult';
         };
         this.local.segments = (e.segments ?? []).map((s) => ({
@@ -187,7 +187,7 @@ export class EventEditorPage {
       return diet === 'vegan';
     }
     if (segKey === 'vegeterian') {
-      return diet === 'vegan' || diet === 'vegetarian' || diet === 'seafood';
+      return diet === 'vegan' || diet === 'vegeterian' || diet === 'seafood';
     }
     if (segKey === 'kid') {
       return info.kid !== false; // exclude if explicitly not kid-friendly
