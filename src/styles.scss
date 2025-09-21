@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'app/assets/styles/colors';
+@use 'app/assets/styles/typography';
+@use 'app/assets/styles/theme';
+
+/* Optional: page-level defaults */
+.page {
+  padding: 1rem;
+}

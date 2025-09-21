@@ -1,27 +1,37 @@
-<h1>Events</h1>
+<div class="page container">
+  <h1>Events <span class="badge">overview</span></h1>
 
-<button (click)="create()">Create Event</button>
+  <button class="btn btn-primary" (click)="create()">➕ Create Event</button>
 
-@if (events$ | async; as events) { @if (events.length > 0) {
-    <ul>
-    @for (e of events; track e.id) {
-    <li>
-        <strong>{{ e.name }}</strong>
-        <small> — {{ e.createdAt | date : 'medium' }}</small>
-        <br />
-        <span
-        >Segments: @for (s of e.segments; track s.key) { {{ s.key }}:{{ s.guests
-        }}{{ $last ? '' : ', ' }}
+  @if (events$ | async; as events) {
+    @if (events.length > 0) {
+      <ul style="list-style:none; padding:0; margin:1rem 0; display:grid; gap:.75rem;">
+        @for (e of events; track e.id) {
+          <li class="card">
+            <div style="display:flex; align-items:center; gap:.5rem; justify-content:space-between;">
+              <div>
+                <strong style="font-size: var(--text-lg)">{{ e.name }}</strong>
+                <small class="muted"> — {{ e.createdAt | date:'medium' }}</small>
+              </div>
+              <div style="display:flex; gap:.5rem;">
+                <a class="btn btn-ghost" [routerLink]="['/events', e.id]">Open</a>
+                <button class="btn" (click)="remove(e.id!)">Delete</button>
+              </div>
+            </div>
+
+            <div style="margin-top:.5rem;">
+              <span class="muted">Segments:</span>
+              <span>
+                @for (s of e.segments; track s.key) {
+                  {{ s.key }}:{{ s.guests }}{{ $last ? '' : ', ' }}
+                }
+              </span>
+            </div>
+          </li>
         }
-        </span>
-        <br />
-        <a [routerLink]="['/events', e.id]">Open</a>
-        &nbsp;|&nbsp;
-        <button (click)="remove(e.id!)">Delete</button>
-    </li>
-    }
-    </ul>
+      </ul>
     } @else {
-    <p>No events yet. Click “Create Event”.</p>
-    } 
-}
+      <p class="muted">No events yet. Click “Create Event”.</p>
+    }
+  }
+</div>

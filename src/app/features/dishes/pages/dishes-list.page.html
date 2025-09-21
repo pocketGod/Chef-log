@@ -1,25 +1,26 @@
-<h1>Dishes</h1>
+<div class="page container">
+  <h1>Dishes <span class="badge">catalog</span></h1>
 
-<button (click)="createDish()">➕ Create Dish</button>
+  <button class="btn btn-primary" (click)="createDish()">➕ Create Dish</button>
 
-@if (dishes$ | async; as dishes) {
-  @if (dishes.length > 0) {
-    <ul>
-      @for (d of dishes; track d.id) {
-        <li>
-          <strong>{{ d.name }}</strong>
+  @if (dishes$ | async; as dishes) {
+    @if (dishes.length > 0) {
+      <ul style="list-style:none; padding:0; margin:1rem 0; display:grid; gap:.75rem;">
+        @for (d of dishes; track d.id) {
+          <li class="card">
+            <div style="display:flex; align-items:center; gap:.5rem;">
+              <strong style="font-size: var(--text-lg)">{{ d.name }}</strong>
+              <a class="btn btn-ghost" [routerLink]="['/dishes', d.id]">Edit</a>
+            </div>
 
-          &nbsp;•&nbsp;
-
-          <a [routerLink]="['/dishes', d.id]">Edit</a>
-
-          @if (d.description) {
-            <div>{{ d.description }}</div>
-          }
-        </li>
-      }
-    </ul>
-  } @else {
-    <p>No dishes yet. Click “Create Dish”.</p>
+            @if (d.description) {
+              <p class="muted" style="margin:.5rem 0 0;">{{ d.description }}</p>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="muted">No dishes yet. Click “Create Dish”.</p>
+    }
   }
-}
+</div>

@@ -1,0 +1,26 @@
+<header class="navbar">
+  <div class="navbar__container">
+    <div class="navbar__brand">
+      <a routerLink="/" class="navbar__logo">🍽️ Chef Log</a>
+    </div>
+
+    <nav class="navbar__links">
+      <a
+        routerLink="/dishes"
+        routerLinkActive="active"
+        class="nav-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Dishes
+      </a>
+      <a
+        routerLink="/events"
+        routerLinkActive="active"
+        class="nav-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Events
+      </a>
+    </nav>
+  </div>
+</header>

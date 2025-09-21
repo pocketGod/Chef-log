@@ -1,101 +1,110 @@
-<a routerLink="/dishes">← Back to Dishes</a>
-<h1>Dish Editor</h1>
+<div class="page container">
+  <a class="btn btn-ghost" routerLink="/dishes">← Back to Dishes</a>
+  <h1>Dish Editor <span class="badge">setup</span></h1>
 
-@if (dish$ | async; as d) {
-<div style="display: grid; gap: 1rem; max-width: 720px">
-  <section>
-    <label>
-      Name:
-      <input [(ngModel)]="local.name" (blur)="save()" />
-    </label>
-  </section>
+  @if (dish$ | async; as d) {
+    <div style="display:grid; gap:1rem; max-width: 880px;">
+      <!-- Basics -->
+      <section class="card">
+        <h3>Basics</h3>
+        <div style="display:grid; gap:.75rem;">
+          <label style="display:block">
+            <span class="muted">Name</span><br />
+            <input [(ngModel)]="local.name" (blur)="save()" />
+          </label>
 
-  <section>
-    <label style="display: block">
-      Description:
-      <textarea
-        [(ngModel)]="local.description"
-        (blur)="save()"
-        rows="3"
-        placeholder="Short notes about this dish (allergens, serving style, etc.)"
-        style="width: 100%"
-      ></textarea>
-    </label>
-  </section>
+          <label style="display:block">
+            <span class="muted">Description</span><br />
+            <textarea
+              [(ngModel)]="local.description"
+              (blur)="save()"
+              rows="3"
+              placeholder="Short notes about this dish (allergens, serving style, etc.)"
+              style="width:100%;"
+            ></textarea>
+          </label>
+        </div>
+      </section>
 
-  <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
-    <label>
-      Base portions per person:
-      <input
-        type="number"
-        step="0.1"
-        min="0"
-        [(ngModel)]="local.basePortionPerPerson"
-        (blur)="save()"
-      />
-    </label>
-
-    <label>
-      Diet:
-      <select [(ngModel)]="local.diet" (change)="save()">
-        <option value="meat">Meat</option>
-        <option value="seafood">Seafood</option>
-        <option value="vegeterian">vegeterian</option>
-        <option value="vegan">Vegan</option>
-      </select>
-    </label>
-
-    <label style="grid-column: 1 / -1; display: flex; align-items: center; gap: 0.5rem">
-      <input type="checkbox" [(ngModel)]="local.kidFriendly" (change)="save()" />
-      Kid friendly
-    </label>
-  </section>
-
-  <section>
-    <h3>Ingredients</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Unit</th>
-          <th>Qty/Portion</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (ing of local.ingredients; track ing.name + '_' + ing.unit) {
-        <tr>
-          <td><input [(ngModel)]="ing.name" (ngModelChange)="markDirty()" /></td>
-          <td>
-            <select [(ngModel)]="ing.unit" (ngModelChange)="markDirty()">
-              <option value="g">g</option>
-              <option value="kg">kg</option>
-              <option value="ml">ml</option>
-              <option value="l">l</option>
-              <option value="pcs">pcs</option>
-            </select>
-          </td>
-          <td>
+      <!-- Settings -->
+      <section class="card">
+        <h3>Serving & Suitability</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+          <label>
+            <span class="muted">Base portions per person</span><br />
             <input
               type="number"
-              step="0.01"
+              step="0.1"
               min="0"
-              [(ngModel)]="ing.qtyPerPortion"
-              (ngModelChange)="markDirty()"
+              [(ngModel)]="local.basePortionPerPerson"
+              (blur)="save()"
             />
-          </td>
-          <td><button (click)="removeIng(ing)">✕</button></td>
-        </tr>
-        }
-      </tbody>
-    </table>
-    <button (click)="addIng()">Add Ingredient</button>
-  </section>
+          </label>
 
-  <div>
-    <button (click)="save()">Save</button>
-  </div>
+          <label>
+            <span class="muted">Diet</span><br />
+            <select [(ngModel)]="local.diet" (change)="save()">
+              <option value="meat">Meat</option>
+              <option value="seafood">Seafood</option>
+              <option value="vegeterian">Vegeterian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </label>
+
+          <label style="grid-column: 1 / -1; display:flex; align-items:center; gap:.5rem;">
+            <input type="checkbox" [(ngModel)]="local.kidFriendly" (change)="save()" />
+            <span>Kid friendly</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Ingredients -->
+      <section class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <h3>Ingredients</h3>
+          <button class="btn" (click)="addIng()">➕ Add Ingredient</button>
+        </div>
+
+        <table class="table" style="width:100%; border-collapse: collapse; margin-top:.5rem;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Name</th>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Unit</th>
+              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Qty/Portion</th>
+              <th style="padding:.5rem; border-bottom:1px solid var(--color-border);"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ing of local.ingredients; track ing.name + '_' + ing.unit) {
+              <tr>
+                <td style="padding:.5rem;"><input [(ngModel)]="ing.name" (ngModelChange)="markDirty()" /></td>
+                <td style="padding:.5rem;">
+                  <select [(ngModel)]="ing.unit" (ngModelChange)="markDirty()">
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="ml">ml</option>
+                    <option value="l">l</option>
+                    <option value="pcs">pcs</option>
+                  </select>
+                </td>
+                <td style="padding:.5rem;">
+                  <input type="number" step="0.01" min="0" [(ngModel)]="ing.qtyPerPortion" (ngModelChange)="markDirty()" />
+                </td>
+                <td style="padding:.5rem; text-align:right;">
+                  <button class="btn" (click)="removeIng(ing)">✕</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      <div style="display:flex; gap:.5rem;">
+        <button class="btn btn-primary" (click)="save()">Save</button>
+        <button class="btn" routerLink="/dishes">Cancel</button>
+      </div>
+    </div>
+  } @else {
+    <p class="muted">Loading dish…</p>
+  }
 </div>
-} @else {
-<p>Loading dish…</p>
-}
