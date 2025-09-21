@@ -6,7 +6,6 @@ export interface Event {
   date?: number;                  // Date.now()
   segments: EventSegment[]; // default rows: adults/kids/vegans
   menu: EventMenuItem[]; // per-event
-  context?: { serviceStyle?: 'buffet'|'plated'; veganOnly?: boolean };
   createdAt: number;
   ownerId?: string;
 }

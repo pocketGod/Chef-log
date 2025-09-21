@@ -9,36 +9,7 @@ import { Router, RouterLink } from '@angular/router';
   selector: 'app-events-list',
   standalone: true,
   imports: [AsyncPipe, DatePipe, RouterLink],
-  template: `
-    <h1>Events</h1>
-
-    <button (click)="create()">Create Event</button>
-
-    @if (events$ | async; as events) {
-      @if (events.length > 0) {
-        <ul>
-          @for (e of events; track e.id) {
-            <li>
-              <strong>{{ e.name }}</strong>
-              <small> — {{ e.createdAt | date:'medium' }}</small>
-              <br />
-              <span>Segments:
-                @for (s of e.segments; track s.key) {
-                  {{s.key}}:{{s.guests}}{{$last ? '' : ', '}}
-                }
-              </span>
-              <br />
-              <a [routerLink]="['/events', e.id]">Open</a>
-              &nbsp;|&nbsp;
-              <button (click)="remove(e.id!)">Delete</button>
-            </li>
-          }
-        </ul>
-      } @else {
-        <p>No events yet. Click “Create Event”.</p>
-      }
-    }
-  `
+  templateUrl:'events-list.page.html'
 })
 export class EventsListPage {
   private db = inject(FirestoreService);

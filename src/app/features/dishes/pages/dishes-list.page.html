@@ -1,0 +1,25 @@
+<h1>Dishes</h1>
+
+<button (click)="createDish()">➕ Create Dish</button>
+
+@if (dishes$ | async; as dishes) {
+  @if (dishes.length > 0) {
+    <ul>
+      @for (d of dishes; track d.id) {
+        <li>
+          <strong>{{ d.name }}</strong>
+
+          &nbsp;•&nbsp;
+
+          <a [routerLink]="['/dishes', d.id]">Edit</a>
+
+          @if (d.description) {
+            <div>{{ d.description }}</div>
+          }
+        </li>
+      }
+    </ul>
+  } @else {
+    <p>No dishes yet. Click “Create Dish”.</p>
+  }
+}

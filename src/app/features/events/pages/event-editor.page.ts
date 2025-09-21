@@ -6,120 +6,13 @@ import { EventsService } from '../events.service';
 import { DishesService } from '../../dishes/dishes.service';
 import { EventMenuItem, EventSegment } from '../../../shared/models/event.model';
 import { Dish } from '../../../shared/models/dish.model';
+import { Diet, GuestTypes } from '../../../shared/models/common.model';
 
 @Component({
   selector: 'app-event-editor',
   standalone: true,
   imports: [AsyncPipe, FormsModule, CommonModule, RouterLink],
-  template: `
-    <a routerLink="/events">← Back to Events</a>
-    <h1>Event Editor</h1>
-
-    @if (event$ | async; as e) {
-    <section class="grid gap-4" style="grid-template-columns: 1fr 1fr 1fr;">
-      <!-- Left: Event details & segments -->
-      <div>
-        <h3>Details</h3>
-        <label>
-          Name:
-          <input [(ngModel)]="local.name" (blur)="saveName(e.id!)" />
-        </label>
-
-        <h3 class="mt-4">Segments</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>Guests</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (s of local.segments; track s.key) {
-            <tr>
-              <td>
-                <select [(ngModel)]="s.key" (ngModelChange)="onSegmentsChange(e.id!)">
-                  <option *ngFor="let t of GuestTypes" [ngValue]="t">{{ t }}</option>
-                </select>
-              </td>
-              <td>
-                <input
-                  type="number"
-                  min="0"
-                  [(ngModel)]="s.guests"
-                  (ngModelChange)="onSegmentsChange(e.id!)"
-                />
-              </td>
-              <td><button (click)="removeSegment(e.id!, s.key)">✕</button></td>
-            </tr>
-            }
-          </tbody>
-        </table>
-        <button (click)="addSegment(e.id!)">Add Segment</button>
-      </div>
-
-      <!-- Middle: Dishes & popularity -->
-      <div>
-        <h3>Menu (per-dish popularity)</h3>
-        @if (dishes$ | async; as dishes) {
-        <ul>
-          @for (d of dishes; track d.id) {
-          <li style="margin-bottom: .75rem;">
-            <label>
-              <input
-                type="checkbox"
-                [checked]="hasDish(d.id!)"
-                (change)="toggleDish(e.id!, d.id!, $event.target.checked)"
-              />
-              <strong>{{ d.name }}</strong>
-              <small> (bpp: {{ bppOf(d.id!) }})</small>
-            </label>
-
-            @if (hasDish(d.id!)) {
-            <div style="display:flex; align-items:center; gap:.5rem;">
-              <span>Popularity:</span>
-              <!-- keep slider responsive locally, persist only on change -->
-              <input
-                type="range"
-                min="0.1"
-                max="3"
-                step="0.1"
-                [ngModel]="localPopularity(d.id!)"
-                (ngModelChange)="setLocalPopularity(d.id!, $event)"
-                (change)="persistPopularity(e.id!, d.id!)"
-              />
-              <span>{{ localPopularity(d.id!) }}</span>
-            </div>
-            }
-          </li>
-          }
-        </ul>
-        }
-      </div>
-
-      <!-- Right: Live totals -->
-      <div>
-        <h3>Totals</h3>
-        <p>
-          Total guests: <strong>{{ totalGuests() }}</strong>
-        </p>
-        <h4>Dish portions</h4>
-        <ul>
-          @for (m of local.menu; track m.dishId) {
-          <li>
-            {{ dishName(m.dishId) }}:
-            {{ computePortions(m.dishId, localPopularity(m.dishId)) | number : '1.0-1' }}
-            <small> (bpp: {{ bppOf(m.dishId) }})</small>
-          </li>
-          }
-        </ul>
-        <!-- Next step: ingredient-level shopping list -->
-      </div>
-    </section>
-    } @else {
-    <p>Loading event…</p>
-    }
-  `,
+  templateUrl:'event-editor.page.html'
 })
 export class EventEditorPage {
   private route = inject(ActivatedRoute);
@@ -131,7 +24,7 @@ export class EventEditorPage {
   eventId = this.route.snapshot.paramMap.get('id')!;
   event$ = this.events.get$(this.eventId);
   dishes$ = this.dishesSvc.list$();
-  GuestTypes: ('adult' | 'kid' | 'vegan' | 'vegeterian')[] = [
+  GuestTypes: GuestTypes[] = [
     'adult',
     'kid',
     'vegan',
@@ -166,7 +59,7 @@ export class EventEditorPage {
         if (!e) return;
         this.local.name = e.name;
         // normalize any old keys to the new union
-        const normalize = (k: string): 'adult' | 'kid' | 'vegan' | 'vegeterian' => {
+        const normalize = (k: string): GuestTypes => {
           const t = (k || '').toLowerCase().trim();
           if (t === 'adult' || t === 'adults') return 'adult';
           if (t === 'kid' || t === 'kids') return 'kid';
@@ -284,18 +177,17 @@ export class EventEditorPage {
     return 1;
   }
 
-  private isSuitable(dishId: string, segKey: 'adult' | 'kid' | 'vegan' | 'vegeterian') {
+  private isSuitable(dishId: string, segKey: GuestTypes) {
     const info = this._dishInfo()[dishId];
     if (!info) return true;
 
-    const diet = (info.diet || 'meat') as 'vegan' | 'vegetarian' | 'pescetarian' | 'meat';
+    const diet = (info.diet || 'meat') as Diet;
 
     if (segKey === 'vegan') {
       return diet === 'vegan';
     }
     if (segKey === 'vegeterian') {
-      // Vegetarians eat no meat and no fish → allow only vegan or vegetarian dishes
-      return diet === 'vegan' || diet === 'vegetarian';
+      return diet === 'vegan' || diet === 'vegetarian' || diet === 'seafood';
     }
     if (segKey === 'kid') {
       return info.kid !== false; // exclude if explicitly not kid-friendly
