@@ -1,18 +1,22 @@
-# ChefLog
+# Chef Log
 
-#### calc:
-` Portions=segment s∑​(Guestss​×SegMult(s)×Suitability(dish,s))×Popularity×BPP `
+**Core math**  
+- `portions = totalGuests × BPP × popularity`  
+- `ingredientAmount = portions × qtyPerPortion`
 
-SegMult: per-segment multiplier (e.g., adults=1, kids=0.6, vegans=1)
+**Terms**  
+- **BPP**: Base portions per person (recipe default; e.g., kebab=2 skewers/person).  
+- **Popularity**: Event-specific demand multiplier (slider).  
+- **qty/portion**: Ingredient amount to make **one portion**.
 
-Suitability: 0/1 depending on dish diet vs. segment (e.g., kebab is 'meat' so Suitability=0 for 'vegans')
+**Flow**  
+1. Sum event segments → `totalGuests`.  
+2. For each menu dish: compute `portions`.  
+3. For each ingredient: add `qtyPerPortion × portions`, grouped by `(ingredientId|name, baseUnit)`.  
+4. Convert big units (`g≥1000→kg`, `ml≥1000→l`; pcs unchanged) and sort by name.
 
-Rules (MVP):
 
-Segment 'vegans' → allow only diet === 'vegan'
-
-Segment 'vegeterians' → allow diet !== 'meat'
-
-Segment 'kids' → if kidFriendly === false then 0, else 1
-
-Anything else → 1
+**Notes**  
+- Missing BPP or popularity → `1`.  
+- Ingredients lacking id or name are ignored.  
+- Units aren’t mixed (pcs vs g/ml kept separate) (l/ml and g/kg do mix).
