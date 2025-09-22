@@ -2,20 +2,22 @@ import { Component, effect, inject, signal, computed } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { EventsService } from '../events.service';
-import { DishesService } from '../../dishes/dishes.service';
-import { EventMenuItem, EventSegment } from '../../../shared/models/event.model';
-import { Dish } from '../../../shared/models/dish.model';
-import { Diet, GuestTypes } from '../../../shared/models/common.model';
-import { TotalCalcRow } from '../../../shared/models/calc.model';
-import { aggregateIngredients } from '../../../shared/Utils/calc';
-import { IngredientsService } from '../../dishes/ingredient.service';
+import { EventsService } from '../../events.service';
+import { DishesService } from '../../../dishes/dishes.service';
+import { EventMenuItem, EventSegment } from '../../../../shared/models/event.model';
+import { Dish } from '../../../../shared/models/dish.model';
+import { Diet, GuestTypes } from '../../../../shared/models/common.model';
+import { TotalCalcRow } from '../../../../shared/models/calc.model';
+import { aggregateIngredients } from '../../../../shared/Utils/calc';
+import { IngredientsService } from '../../../dishes/ingredient.service';
+import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
 
 @Component({
   selector: 'app-event-editor',
   standalone: true,
-  imports: [AsyncPipe, FormsModule, CommonModule, RouterLink],
+  imports: [AsyncPipe, FormsModule, CommonModule, RouterLink, CheckComponent],
   templateUrl: 'event-editor.page.html',
+  styleUrl:'event-editor.page.scss'
 })
 export class EventEditorPage {
   private route = inject(ActivatedRoute);

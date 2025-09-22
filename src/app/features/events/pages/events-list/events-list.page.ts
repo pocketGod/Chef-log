@@ -1,15 +1,16 @@
 import { Component, inject } from '@angular/core';
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { FirestoreService, WithId } from '../../../core/data/firestore.service';
-import { EventDoc } from '../../../shared/models/event.model';
+import { AsyncPipe, CommonModule, DatePipe } from '@angular/common';
+import { FirestoreService, WithId } from '../../../../core/data/firestore.service';
+import { EventDoc } from '../../../../shared/models/event.model';
 import { Router, RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-events-list',
   standalone: true,
-  imports: [AsyncPipe, DatePipe, RouterLink],
-  templateUrl:'events-list.page.html'
+  imports: [AsyncPipe, DatePipe, RouterLink, CommonModule],
+  templateUrl:'events-list.page.html',
+  styleUrl:'events-list.page.scss'
 })
 export class EventsListPage {
   private db = inject(FirestoreService);

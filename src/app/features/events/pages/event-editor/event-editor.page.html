@@ -1,0 +1,140 @@
+<div class="page container">
+  <a class="btn btn-ghost" routerLink="/events">← Back to Events</a>
+  <h1 class="page__title">Event Editor <span class="badge">planner</span></h1>
+
+  @if (event$ | async; as e) {
+    <section class="ee-grid">
+      <!-- LEFT: Details & Segments -->
+      <div class="card ee-card ee-col-left">
+        <h3>Details</h3>
+        <label class="field">
+          <span class="field__label">Name</span>
+          <input [(ngModel)]="local.name" (blur)="saveName(e.id!)" />
+        </label>
+
+        <h3 class="ee-seg__title">Segments</h3>
+        <table class="table ee-seg__table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Guests</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of local.segments; track s.key) {
+              <tr>
+                <td>
+                  <select [(ngModel)]="s.key" (ngModelChange)="onSegmentsChange(e.id!)">
+                    <option *ngFor="let t of allowedTypesFor(s)" [ngValue]="t">{{ t }}</option>
+                  </select>
+                </td>
+                <td>
+                  <input type="number" min="0" [(ngModel)]="s.guests" (ngModelChange)="onSegmentsChange(e.id!)" />
+                </td>
+                <td class="ee-end">
+                  <button class="btn btn-ghost" (click)="removeSegment(e.id!, s.key)">✕</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (remainingTypes().length !== 0) {
+          <button class="btn ee-seg__add" (click)="addSegment(e.id!)">➕ Add Segment</button>
+        }
+      </div>
+
+      <!-- MIDDLE: Menu -->
+      <div class="card ee-card">
+        <h3>Menu (per-dish popularity)</h3>
+
+        @if (dishes$ | async; as dishes) {
+          <ul class="ee-menu">
+            @for (d of dishes; track d.id) {
+              <li class="ee-menu__item">
+                <div class="ee-menu__row">
+                  <app-check
+                    [label]="d.name"
+                    [checked]="hasDish(d.id!)"
+                    (checkedChange)="toggleDish(e.id!, d.id!, $event)"
+                  />
+                  <small class="muted">bpp: {{ bppOf(d.id!) }}</small>
+                </div>
+
+                @if (hasDish(d.id!)) {
+                  <div class="ee-menu__pop">
+                    <span class="muted">Popularity</span>
+                    <input
+                      class="ee-range"
+                      type="range"
+                      min="0.1"
+                      max="3"
+                      step="0.1"
+                      [ngModel]="localPopularity(d.id!)"
+                      (ngModelChange)="setLocalPopularity(d.id!, $event)"
+                      (change)="persistPopularity(e.id!, d.id!)"
+                    />
+                    <span class="ee-menu__popVal">{{ localPopularity(d.id!) }}</span>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- RIGHT: Totals -->
+      <aside class="card ee-card ee-col-right">
+        <h3>Totals</h3>
+
+        <p> Total guests:
+          <strong class="ee-accent">{{ totalGuests() }}</strong>
+        </p>
+
+        <h4 class="ee-subtitle">Dish portions</h4>
+        <ul class="ee-portions">
+          @for (m of local.menu; track m.dishId) {
+            <li class="ee-portions__row">
+              <span class="ee-portions__name">{{ dishName(m.dishId) }}:</span>
+              <span class="ee-portions__amt">
+                {{ computePortions(m.dishId, localPopularity(m.dishId)) | number:'1.0-1' }}
+                <small class="muted">bpp: {{ bppOf(m.dishId) }}</small>
+              </span>
+            </li>
+          }
+        </ul>
+
+        <div class="ee-totalHdr">
+          <span>Total ingredients</span>
+          <button class="btn" (click)="recalcTotals()">↻ Recalculate</button>
+        </div>
+
+        @if (isCalcBusy) {
+          <p class="muted">Calculating totals…</p>
+        } @else if (!totals?.length) {
+          <p class="muted">No ingredients to show yet.</p>
+        } @else {
+          <table class="table ee-totalTbl">
+            <thead>
+              <tr>
+                <th>Ingredient</th>
+                <th class="ee-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of displayTotals; track t.name) {
+                <tr>
+                  <td>{{ t.name }}</td>
+                  <td class="ee-end">{{ t.amount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </aside>
+    </section>
+  } @else {
+    <p class="muted">Loading event…</p>
+  }
+</div>
