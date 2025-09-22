@@ -20,3 +20,10 @@
 - Missing BPP or popularity → `1`.  
 - Ingredients lacking id or name are ignored.  
 - Units aren’t mixed (pcs vs g/ml kept separate) (l/ml and g/kg do mix).
+
+
+
+
+**Manual deployment**  
+`ng build --configuration production`
+`firebase deploy --only hosting`
