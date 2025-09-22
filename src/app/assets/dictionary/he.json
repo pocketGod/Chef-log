@@ -1,12 +1,13 @@
 {
   "app.title": "מחשבון השף",
   "login.title": "התחברות",
-    "login.signInPrompt": "היכנס באמצעות חשבון Google שלך.",
+  "login.signInPrompt": "היכנס באמצעות חשבון Google שלך.",
   "login.signInGoogle": "התחבר עם Google",
-  
+  "login.unaothorized":"לחשבון שניסית להתחבר איתו אין הרשאות להשתמש באפליקציה",
+
   "common.save": "שמירה",
   "common.cancel": "ביטול",
-    "common.units.g": "גרם",
+  "common.units.g": "גרם",
   "common.units.kg": "ק״ג",
   "common.units.ml": "מ״ל",
   "common.units.l": "ליטר",
@@ -19,10 +20,10 @@
   "dishes.title": "מנות",
   "dishes.badge.catalog": "קטלוג",
   "dishes.create": "➕ צור מנה",
-    "dish.tags.notKidFriendly": "לא ידידותי לילדים",
-    "dish.edit": "עריכה",
+  "dish.tags.notKidFriendly": "לא ידידותי לילדים",
+  "dish.edit": "עריכה",
 
-     "dishEditor.back": "← חזרה למנות",
+  "dishEditor.back": "← חזרה למנות",
   "dishEditor.title": "עורך מנה",
   "dishEditor.badge.setup": "הגדרות",
 
@@ -52,8 +53,6 @@
 
   "dishEditor.ingredients.search.placeholder": "חפש או הוסף...",
 
-
-
   "dishEditor.actions.save": "שמירה",
 
   "filters.title": "מסננים",
@@ -75,7 +74,7 @@
   "diet.seafood": "אוכל ים",
 
   "event.editor": "עורך אירוע",
-"events.title": "אירועים",
+  "events.title": "אירועים",
   "events.badge.overview": "סקירה",
   "events.create": "➕ צור אירוע",
 
@@ -83,7 +82,7 @@
   "event.card.delete": "מחק",
   "event.card.segments": "מקטעים:",
 
-    "eventEditor.back": "← חזרה לאירועים",
+  "eventEditor.back": "← חזרה לאירועים",
   "eventEditor.title": "עורך אירוע",
   "eventEditor.badge.planner": "מתכנן",
 
@@ -111,7 +110,6 @@
 
   "segment.adult": "מבוגרים",
   "segment.kid": "ילדים",
-    "segment.vegan": "טבעונים",
+  "segment.vegan": "טבעונים",
   "segment.vegeterian": "צמחונים"
-
 }
