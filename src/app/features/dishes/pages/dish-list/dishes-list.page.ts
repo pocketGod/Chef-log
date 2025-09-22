@@ -4,15 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BehaviorSubject, combineLatest } from 'rxjs';      
 import { map } from 'rxjs/operators';                       
-import { DishesService } from '../dishes.service';
-import { Dish } from '../../../shared/models/dish.model';
-import { Diet, GuestTypes } from '../../../shared/models/common.model';  
+import { DishesService } from '../../dishes.service';
+import { Dish } from '../../../../shared/models/dish.model';
+import { Diet, GuestTypes } from '../../../../shared/models/common.model';  
+import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-dishes-list',
   standalone: true,
-  imports: [AsyncPipe, RouterLink, FormsModule, CommonModule],            
-  templateUrl: 'dishes-list.page.html'
+  imports: [AsyncPipe, RouterLink, FormsModule, CommonModule, CheckComponent, LoaderComponent],            
+  templateUrl: 'dishes-list.page.html',
+   styleUrls: ['dishes-list.page.scss']
 })
 export class DishesListPage {
   private svc = inject(DishesService);
@@ -26,6 +29,8 @@ export class DishesListPage {
 
   GuestTypes: GuestTypes[] = ['adult', 'kid', 'vegan', 'vegeterian'];
   Diets: Diet[] = ['vegan', 'vegeterian', 'seafood', 'meat'];
+
+  Array = Array
 
   filtered$ = combineLatest([this.dishes$, this.search$, this.selectedGuest$, this.selectedDiet$]).pipe(
     map(([dishes, q, selGuest, selDiet]) => {

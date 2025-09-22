@@ -5,16 +5,19 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 
-import { DishesService } from '../dishes.service';
-import { Dish, DishIngredient } from '../../../shared/models/dish.model';
-import { Diet, Unit } from '../../../shared/models/common.model';
-import { IngredientsService } from '../ingredient.service';
+import { DishesService } from '../../dishes.service';
+import { Dish, DishIngredient } from '../../../../shared/models/dish.model';
+import { Diet, Unit } from '../../../../shared/models/common.model';
+import { IngredientsService } from '../../ingredient.service';
+import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-dish-editor',
   standalone: true,
-  imports: [AsyncPipe, FormsModule, RouterLink],
+  imports: [AsyncPipe, FormsModule, RouterLink, CheckComponent, LoaderComponent],
   templateUrl: 'dish-editor.page.html',
+  styleUrls: ['./dish-editor.page.scss'],
 })
 export class DishEditorPage {
   private route = inject(ActivatedRoute);
@@ -85,11 +88,13 @@ export class DishEditorPage {
       });
   }
 
-  /** Batch-load names for ingredient ids (chunks of 10 due to Firestore whereIn limit). */
+  setKidFriendly(v: boolean) {
+    this.local.kidFriendly = v;
+    this.save();
+  }
+
   private async loadIngredientNames(ids: string[]) {
     const out: Record<string, string> = {};
-    // If your IngredientsService has a getMany(ids) use it; otherwise fetch one by one:
-    // (Small lists are fine; dishes rarely have > 20 ingredients)
     for (const id of ids) {
       const doc = await this.ingSvc.getById(id);
       if (doc) out[id] = (doc as any).name || '';
@@ -194,6 +199,6 @@ export class DishEditorPage {
   }
 
   markDirty() {
-    /* reserved for UX */
+    /* TODO */
   }
 }

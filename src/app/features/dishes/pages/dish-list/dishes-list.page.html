@@ -1,0 +1,72 @@
+<div class="page container">
+  <h1 class="page__title">Dishes <span class="badge">catalog</span></h1>
+
+  <div class="layout layout--reverse">
+    <aside class="layout__side">
+      <button class="btn btn-primary" (click)="createDish()">➕ Create Dish</button>
+
+      <div class="filters card">
+        <div class="filters__header">
+          <div class="filters__title">Filters</div>
+          <button class="btn btn-ghost" (click)="clearFilters()">Clear</button>
+        </div>
+
+        <div class="filters__search">
+          <svg class="filters__searchIcon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 21l-4.3-4.3m1.3-5a7 7 0 11-14 0 7 7 0 0114 0z" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <input class="filters__input" type="search" placeholder="Search dishes…" (input)="setSearch($event.target.value)" />
+        </div>
+
+        <div class="filters__chips" *ngIf="selectedGuest$.value.size || selectedDiet$.value.size">
+          <span class="chip" *ngFor="let g of Array.from(selectedGuest$.value)">{{ g }}</span>
+          <span class="chip chip--green" *ngFor="let d of Array.from(selectedDiet$.value)">{{ d }}</span>
+        </div>
+
+        <div class="filters__section">
+          <div class="filters__label">Guest types</div>
+          <div class="filters__grid">
+            <app-check *ngFor="let t of GuestTypes" [label]="t" [checked]="selectedGuest$.value.has(t)" (checkedChange)="toggleGuest(t)" />
+          </div>
+        </div>
+
+        <div class="filters__section">
+          <div class="filters__label">Diet</div>
+          <div class="filters__grid">
+            <app-check *ngFor="let d of Diets" [label]="d" [checked]="selectedDiet$.value.has(d)" (checkedChange)="toggleDiet(d)" />
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    @if (filtered$ | async; as dishes) {
+    <section class="layout__main results">
+      @if (dishes.length > 0) {
+      <ul class="results__list">
+        @for (d of dishes; track d.id) {
+        <li class="dish-card card">
+          <div class="dish-card__header">
+            <div class="dish-card__titleRow">
+              <h3 class="dish-card__title">{{ d.name }}</h3>
+              <div class="dish-card__tags">
+                <span class="tag" [ngClass]="'tag--diet-' + (d.diet || 'meat')">{{ d.diet }}</span>
+                <span class="tag tag--warn" *ngIf="d.kidFriendly === false;">not kid friendly</span>
+              </div>
+            </div>
+
+            <a class="btn btn-ghost dish-card__action" [routerLink]="['/dishes', d.id]">Edit</a>
+          </div>
+
+          <p class="dish-card__desc" *ngIf="d.description">{{ d.description }}</p>
+        </li>
+        }
+      </ul>
+      } @else {
+      <p class="muted results__empty">No dishes match your filters.</p>
+      }
+    </section>
+    } @else {
+  <app-loader class="editor__loader"></app-loader>
+}
+  </div>
+</div>

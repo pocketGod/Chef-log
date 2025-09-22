@@ -5,22 +5,28 @@
     </div>
 
     <nav class="navbar__links">
-      <a
-        routerLink="/dishes"
-        routerLinkActive="active"
-        class="nav-link"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        Dishes
-      </a>
-      <a
-        routerLink="/events"
-        routerLinkActive="active"
-        class="nav-link"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        Events
-      </a>
+
+      @if(showNav()){
+        <a
+          routerLink="/dishes"
+          routerLinkActive="active"
+          class="nav-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Dishes
+        </a>
+        <a
+          routerLink="/events"
+          routerLinkActive="active"
+          class="nav-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Events
+        </a>
+        <a class="nav-link" (click)="logout()">Logout</a>
+      }
     </nav>
+
+  
   </div>
 </header>
