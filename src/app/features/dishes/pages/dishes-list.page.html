@@ -1,15 +1,51 @@
 <div class="page container">
   <h1>Dishes <span class="badge">catalog</span></h1>
 
-  <button class="btn btn-primary" (click)="createDish()">➕ Create Dish</button>
+  <div style="display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;">
+    <button class="btn btn-primary" (click)="createDish()">➕ Create Dish</button>
 
-  @if (dishes$ | async; as dishes) {
+    <!-- Filters -->
+    <div class="card" style="padding:.5rem .75rem; display:flex; gap:.75rem; align-items:center;">
+      <input
+        type="search"
+        placeholder="Search dishes…"
+        (input)="setSearch($event.target.value)"
+        style="min-width: 220px;"
+      />
+
+      <div>
+        <span class="muted" style="margin-right:.5rem;">Guest types:</span>
+        <label *ngFor="let t of GuestTypes" style="margin-right:.5rem;">
+          <input type="checkbox"
+                 [checked]="selectedGuest$.value.has(t)"
+                 (change)="toggleGuest(t)" />
+          {{t}}
+        </label>
+      </div>
+
+      <div>
+        <span class="muted" style="margin-right:.5rem;">Diet:</span>
+        <label *ngFor="let d of Diets" style="margin-right:.5rem;">
+          <input type="checkbox"
+                 [checked]="selectedDiet$.value.has(d)"
+                 (change)="toggleDiet(d)" />
+          {{d}}
+        </label>
+      </div>
+
+      <button class="btn btn-ghost" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+
+  @if (filtered$ | async; as dishes) {
     @if (dishes.length > 0) {
       <ul style="list-style:none; padding:0; margin:1rem 0; display:grid; gap:.75rem;">
         @for (d of dishes; track d.id) {
           <li class="card">
             <div style="display:flex; align-items:center; gap:.5rem;">
               <strong style="font-size: var(--text-lg)">{{ d.name }}</strong>
+              <span class="badge">{{ d.diet }}</span>
+              <span class="badge" *ngIf="d.kidFriendly !== false">kid ok</span>
               <a class="btn btn-ghost" [routerLink]="['/dishes', d.id]">Edit</a>
             </div>
 
@@ -20,7 +56,7 @@
         }
       </ul>
     } @else {
-      <p class="muted">No dishes yet. Click “Create Dish”.</p>
+      <p class="muted">No dishes match your filters.</p>
     }
   }
 </div>
