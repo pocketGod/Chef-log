@@ -11,11 +11,12 @@ import { TotalCalcRow } from '../../../../shared/models/calc.model';
 import { aggregateIngredients } from '../../../../shared/Utils/calc';
 import { IngredientsService } from '../../../dishes/ingredient.service';
 import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-event-editor',
   standalone: true,
-  imports: [AsyncPipe, FormsModule, CommonModule, RouterLink, CheckComponent],
+  imports: [AsyncPipe, FormsModule, CommonModule, RouterLink, CheckComponent, LoaderComponent],
   templateUrl: 'event-editor.page.html',
   styleUrl:'event-editor.page.scss'
 })
