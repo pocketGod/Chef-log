@@ -36,7 +36,6 @@ export class EventEditorPage {
   >({});
   private _dishInfoComputed = computed(() => this._dishInfo());
 
-
   // helpers for template
   dishName = (id: string) => this._dishInfoComputed()[id]?.name ?? 'Dish';
   bppOf = (id: string) => this._dishInfoComputed()[id]?.bpp ?? 1;
@@ -109,8 +108,20 @@ export class EventEditorPage {
     return this.local.segments.reduce((sum, s) => sum + (Number(s.guests) || 0), 0);
   }
 
+  remainingTypes(): GuestTypes[] {
+    const used = new Set(this.local.segments.map((s) => s.key));
+    return this.GuestTypes.filter((t) => !used.has(t));
+  }
+
+  allowedTypesFor(s: EventSegment): GuestTypes[] {
+    const usedOther = new Set(this.local.segments.filter((x) => x !== s).map((x) => x.key));
+    return this.GuestTypes.filter((t) => t === s.key || !usedOther.has(t));
+  }
+
   addSegment(id: string) {
-    this.local.segments = [...this.local.segments, { key: 'adult', guests: 0 }];
+    const avail = this.remainingTypes();
+    if (!avail.length) return; // nothing left to add
+    this.local.segments = [...this.local.segments, { key: avail[0], guests: 0 }];
     this.onSegmentsChange(id);
   }
 
@@ -176,36 +187,44 @@ export class EventEditorPage {
   }
 
   async recalcTotals() {
-  const ids = (this.local.menu ?? []).map(m => m.dishId);
-  if (!ids.length) { this.totals = []; return; }
-  this.isCalcBusy = true;
-  try {
-    const dishes = await this.dishesSvc.getMany(ids);
-
-    // collect unique ingredient ids from these dishes
-    const ingIds = Array.from(new Set(
-      dishes.flatMap(d => (d.ingredients ?? []).map(r => r.ingredientId).filter(Boolean) as string[])
-    ));
-
-    const nameById: Record<string, string> = {};
-    for (const id of ingIds) {
-      const doc = await this.ingSvc.getById(id);
-      if (doc) nameById[id] = (doc as any).name || '';
+    const ids = (this.local.menu ?? []).map((m) => m.dishId);
+    if (!ids.length) {
+      this.totals = [];
+      return;
     }
+    this.isCalcBusy = true;
+    try {
+      const dishes = await this.dishesSvc.getMany(ids);
 
-    const evtLike = {
-      segments: this.local.segments,
-      menu: this.local.menu.map(m => ({ dishId: m.dishId, popularity: this.localPopularity(m.dishId) })),
-    } as any;
+      // collect unique ingredient ids from these dishes
+      const ingIds = Array.from(
+        new Set(
+          dishes.flatMap(
+            (d) => (d.ingredients ?? []).map((r) => r.ingredientId).filter(Boolean) as string[]
+          )
+        )
+      );
 
-    this.totals = aggregateIngredients(dishes as any, evtLike, nameById);
-    (this as any).displayTotals = this.toDisplayTotals(this.totals);
+      const nameById: Record<string, string> = {};
+      for (const id of ingIds) {
+        const doc = await this.ingSvc.getById(id);
+        if (doc) nameById[id] = (doc as any).name || '';
+      }
 
-  } finally {
-    this.isCalcBusy = false;
+      const evtLike = {
+        segments: this.local.segments,
+        menu: this.local.menu.map((m) => ({
+          dishId: m.dishId,
+          popularity: this.localPopularity(m.dishId),
+        })),
+      } as any;
+
+      this.totals = aggregateIngredients(dishes as any, evtLike, nameById);
+      (this as any).displayTotals = this.toDisplayTotals(this.totals);
+    } finally {
+      this.isCalcBusy = false;
+    }
   }
-}
-
 
   saveName(id: string) {
     this.events.update(id, { name: this.local.name.trim() || 'Untitled Event' });
@@ -214,47 +233,58 @@ export class EventEditorPage {
     /* reserved for future UX */
   }
 
-
   private toDisplayTotals(rows: TotalCalcRow[]) {
-  // group by name, sum per base family
-  const byName: Record<string, { g: number; ml: number; pcs: number }> = {};
+    // group by name, sum per base family
+    const byName: Record<string, { g: number; ml: number; pcs: number }> = {};
 
-  for (const r of rows) {
-    const k = r.name || 'Unnamed';
-    byName[k] ||= { g: 0, ml: 0, pcs: 0 };
+    for (const r of rows) {
+      const k = r.name || 'Unnamed';
+      byName[k] ||= { g: 0, ml: 0, pcs: 0 };
 
-    switch (r.unit) {
-      case 'kg': byName[k].g  += r.qty * 1000; break;
-      case 'g':  byName[k].g  += r.qty;        break;
-      case 'l':  byName[k].ml += r.qty * 1000; break;
-      case 'ml': byName[k].ml += r.qty;        break;
-      case 'pcs':byName[k].pcs+= r.qty;        break;
+      switch (r.unit) {
+        case 'kg':
+          byName[k].g += r.qty * 1000;
+          break;
+        case 'g':
+          byName[k].g += r.qty;
+          break;
+        case 'l':
+          byName[k].ml += r.qty * 1000;
+          break;
+        case 'ml':
+          byName[k].ml += r.qty;
+          break;
+        case 'pcs':
+          byName[k].pcs += r.qty;
+          break;
+      }
     }
+
+    // compact and build display string
+    const out = Object.entries(byName).map(([name, sums]) => {
+      const parts: string[] = [];
+
+      if (sums.pcs > 0) parts.push(`${this.formatNum(sums.pcs)} pcs`);
+      if (sums.g > 0)
+        parts.push(
+          sums.g >= 1000 ? `${this.formatNum(sums.g / 1000)} kg` : `${this.formatNum(sums.g)} g`
+        );
+      if (sums.ml > 0)
+        parts.push(
+          sums.ml >= 1000 ? `${this.formatNum(sums.ml / 1000)} l` : `${this.formatNum(sums.ml)} ml`
+        );
+
+      return { name, amount: parts.join(' + ') || '—' };
+    });
+
+    // stable order
+    return out.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // compact and build display string
-  const out = Object.entries(byName).map(([name, sums]) => {
-    const parts: string[] = [];
-
-    if (sums.pcs > 0) parts.push(`${this.formatNum(sums.pcs)} pcs`);
-    if (sums.g   > 0) parts.push(
-      sums.g >= 1000 ? `${this.formatNum(sums.g / 1000)} kg` : `${this.formatNum(sums.g)} g`
-    );
-    if (sums.ml  > 0) parts.push(
-      sums.ml >= 1000 ? `${this.formatNum(sums.ml / 1000)} l` : `${this.formatNum(sums.ml)} ml`
-    );
-
-    return { name, amount: parts.join(' + ') || '—' };
-  });
-
-  // stable order
-  return out.sort((a,b) => a.name.localeCompare(b.name));
-}
-
-// tiny number formatter to match your table pipe
-private formatNum(n: number) {
-  return Number.isFinite(n) ? Number(n.toFixed(2)).toString().replace(/\.00$/,'') : '0';
-}
+  // tiny number formatter to match your table pipe
+  private formatNum(n: number) {
+    return Number.isFinite(n) ? Number(n.toFixed(2)).toString().replace(/\.00$/, '') : '0';
+  }
 
   private segMultiplier(segKey: string) {
     // need to tweak

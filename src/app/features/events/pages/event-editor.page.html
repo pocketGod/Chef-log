@@ -3,123 +3,174 @@
   <h1>Event Editor <span class="badge">planner</span></h1>
 
   @if (event$ | async; as e) {
-    <section style="display:grid; gap:1rem; grid-template-columns: 1fr 1fr 1fr;">
-      <!-- Details & Segments -->
-      <div class="card">
-        <h3>Details</h3>
-        <label>
-          <span class="muted">Name</span><br />
-          <input [(ngModel)]="local.name" (blur)="saveName(e.id!)" />
-        </label>
+  <section style="display: grid; gap: 1rem; grid-template-columns: 1fr 1fr 1fr">
+    <!-- Details & Segments -->
+    <div class="card">
+      <h3>Details</h3>
+      <label>
+        <span class="muted">Name</span><br />
+        <input [(ngModel)]="local.name" (blur)="saveName(e.id!)" />
+      </label>
 
-        <h3 style="margin-top:1rem;">Segments</h3>
-        <table style="width:100%; border-collapse: collapse;">
-          <thead>
-            <tr>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Type</th>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Guests</th>
-              <th style="padding:.5rem; border-bottom:1px solid var(--color-border);"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (s of local.segments; track s.key) {
-              <tr>
-                <td style="padding:.5rem;">
-                  <select [(ngModel)]="s.key" (ngModelChange)="onSegmentsChange(e.id!)">
-                    <option *ngFor="let t of GuestTypes" [ngValue]="t">{{ t }}</option>
-                  </select>
-                </td>
-                <td style="padding:.5rem;">
-                  <input type="number" min="0" [(ngModel)]="s.guests" (ngModelChange)="onSegmentsChange(e.id!)" />
-                </td>
-                <td style="padding:.5rem; text-align:right;">
-                  <button class="btn" (click)="removeSegment(e.id!, s.key)">✕</button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-
-        <div style="margin-top:.75rem;">
-          <button class="btn" (click)="addSegment(e.id!)">➕ Add Segment</button>
-        </div>
-      </div>
-
-      <!-- Menu -->
-      <div class="card">
-        <h3>Menu (per-dish popularity)</h3>
-        @if (dishes$ | async; as dishes) {
-          <ul style="list-style:none; padding:0; margin:0;">
-            @for (d of dishes; track d.id) {
-              <li style="margin-bottom:.75rem;">
-                <label style="display:flex; align-items:center; gap:.5rem;">
-                  <input type="checkbox" [checked]="hasDish(d.id!)" (change)="toggleDish(e.id!, d.id!, $event.target.checked)" />
-                  <strong>{{ d.name }}</strong>
-                  <small class="muted">bpp: {{ bppOf(d.id!) }}</small>
-                </label>
-
-                @if (hasDish(d.id!)) {
-                  <div style="display:flex; align-items:center; gap:.5rem; margin-top:.25rem;">
-                    <span class="muted">Popularity</span>
-                    <input type="range" min="0.1" max="3" step="0.1"
-                           [ngModel]="localPopularity(d.id!)"
-                           (ngModelChange)="setLocalPopularity(d.id!, $event)"
-                           (change)="persistPopularity(e.id!, d.id!)" />
-                    <span>{{ localPopularity(d.id!) }}</span>
-                  </div>
-                }
-              </li>
-            }
-          </ul>
-        }
-      </div>
-
-      <!-- Totals -->
-      <div class="card">
-        <h3>Totals</h3>
-        <p> Total guests: <strong style="color: var(--color-primary);">{{ totalGuests() }}</strong> </p>
-
-        <h4 style="margin-top:.5rem;">Dish portions</h4>
-        <ul style="list-style:none; padding:0; margin:.5rem 0 0;">
-          @for (m of local.menu; track m.dishId) {
-            <li style="padding:.25rem 0;">
-              {{ dishName(m.dishId) }}:
-              {{ computePortions(m.dishId, localPopularity(m.dishId)) | number:'1.0-1' }}
-              <small class="muted">bpp: {{ bppOf(m.dishId) }}</small>
-            </li>
+      <h3 style="margin-top: 1rem">Segments</h3>
+      <table style="width: 100%; border-collapse: collapse">
+        <thead>
+          <tr>
+            <th
+              style="
+                text-align: left;
+                padding: 0.5rem;
+                border-bottom: 1px solid var(--color-border);
+              "
+            >
+              Type
+            </th>
+            <th
+              style="
+                text-align: left;
+                padding: 0.5rem;
+                border-bottom: 1px solid var(--color-border);
+              "
+            >
+              Guests
+            </th>
+            <th style="padding: 0.5rem; border-bottom: 1px solid var(--color-border)"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of local.segments; track s.key) {
+          <tr>
+            <td style="padding: 0.5rem">
+              <select [(ngModel)]="s.key" (ngModelChange)="onSegmentsChange(e.id!)">
+                <option *ngFor="let t of allowedTypesFor(s)" [ngValue]="t">{{ t }}</option>
+              </select>
+            </td>
+            <td style="padding: 0.5rem">
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="s.guests"
+                (ngModelChange)="onSegmentsChange(e.id!)"
+              />
+            </td>
+            <td style="padding: 0.5rem; text-align: right">
+              <button class="btn" (click)="removeSegment(e.id!, s.key)">✕</button>
+            </td>
+          </tr>
           }
-        </ul>
+        </tbody>
+      </table>
+      @if(remainingTypes().length !== 0){
+        <button class="btn" (click)="addSegment(e.id!)">
+          ➕ Add Segment
+        </button>
+      }
+    </div>
 
-        <h4 style="margin-top:1rem; display:flex; align-items:center; justify-content:space-between;">
-          <span>Total ingredients</span>
-          <button class="btn" (click)="recalcTotals()">↻ Recalculate</button>
-        </h4>
+    <!-- Menu -->
+    <div class="card">
+      <h3>Menu (per-dish popularity)</h3>
+      @if (dishes$ | async; as dishes) {
+      <ul style="list-style: none; padding: 0; margin: 0">
+        @for (d of dishes; track d.id) {
+        <li style="margin-bottom: 0.75rem">
+          <label style="display: flex; align-items: center; gap: 0.5rem">
+            <input
+              type="checkbox"
+              [checked]="hasDish(d.id!)"
+              (change)="toggleDish(e.id!, d.id!, $event.target.checked)"
+            />
+            <strong>{{ d.name }}</strong>
+            <small class="muted">bpp: {{ bppOf(d.id!) }}</small>
+          </label>
 
-        @if (isCalcBusy) {
-          <p class="muted">Calculating totals…</p>
-        } @else if (!totals?.length) {
-          <p class="muted">No ingredients to show yet.</p>
-        } @else {
-          <table class="table" style="width:100%; border-collapse:collapse; margin-top:.5rem;">
-            <thead>
-              <tr>
-                <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Ingredient</th>
-                <th style="text-align:right; padding:.5rem; border-bottom:1px solid var(--color-border);">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (t of displayTotals; track t.name) {
-                <tr>
-                  <td style="padding:.5rem;">{{ t.name }}</td>
-                  <td style="padding:.5rem; text-align:right;">{{ t.amount }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+          @if (hasDish(d.id!)) {
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem">
+            <span class="muted">Popularity</span>
+            <input
+              type="range"
+              min="0.1"
+              max="3"
+              step="0.1"
+              [ngModel]="localPopularity(d.id!)"
+              (ngModelChange)="setLocalPopularity(d.id!, $event)"
+              (change)="persistPopularity(e.id!, d.id!)"
+            />
+            <span>{{ localPopularity(d.id!) }}</span>
+          </div>
+          }
+        </li>
         }
-      </div>
-    </section>
+      </ul>
+      }
+    </div>
+
+    <!-- Totals -->
+    <div class="card">
+      <h3>Totals</h3>
+      <p>
+        Total guests: <strong style="color: var(--color-primary)">{{ totalGuests() }}</strong>
+      </p>
+
+      <h4 style="margin-top: 0.5rem">Dish portions</h4>
+      <ul style="list-style: none; padding: 0; margin: 0.5rem 0 0">
+        @for (m of local.menu; track m.dishId) {
+        <li style="padding: 0.25rem 0">
+          {{ dishName(m.dishId) }}:
+          {{ computePortions(m.dishId, localPopularity(m.dishId)) | number : '1.0-1' }}
+          <small class="muted">bpp: {{ bppOf(m.dishId) }}</small>
+        </li>
+        }
+      </ul>
+
+      <h4
+        style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between"
+      >
+        <span>Total ingredients</span>
+        <button class="btn" (click)="recalcTotals()">↻ Recalculate</button>
+      </h4>
+
+      @if (isCalcBusy) {
+      <p class="muted">Calculating totals…</p>
+      } @else if (!totals?.length) {
+      <p class="muted">No ingredients to show yet.</p>
+      } @else {
+      <table class="table" style="width: 100%; border-collapse: collapse; margin-top: 0.5rem">
+        <thead>
+          <tr>
+            <th
+              style="
+                text-align: left;
+                padding: 0.5rem;
+                border-bottom: 1px solid var(--color-border);
+              "
+            >
+              Ingredient
+            </th>
+            <th
+              style="
+                text-align: right;
+                padding: 0.5rem;
+                border-bottom: 1px solid var(--color-border);
+              "
+            >
+              Amount
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of displayTotals; track t.name) {
+          <tr>
+            <td style="padding: 0.5rem">{{ t.name }}</td>
+            <td style="padding: 0.5rem; text-align: right">{{ t.amount }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </section>
   } @else {
-    <p class="muted">Loading event…</p>
+  <p class="muted">Loading event…</p>
   }
 </div>
