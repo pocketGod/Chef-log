@@ -18,7 +18,7 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
   standalone: true,
   imports: [AsyncPipe, FormsModule, CommonModule, RouterLink, CheckComponent, LoaderComponent],
   templateUrl: 'event-editor.page.html',
-  styleUrl:'event-editor.page.scss'
+  styleUrl: 'event-editor.page.scss',
 })
 export class EventEditorPage {
   private route = inject(ActivatedRoute);
@@ -78,6 +78,7 @@ export class EventEditorPage {
           key: normalize(s.key),
           guests: Number(s.guests) || 0,
         }));
+        this.ensureAllSegments();
         this.local.menu = (e.menu ?? []).map((m) => ({ ...m }));
         const cache: Record<string, number> = {};
         for (const m of this.local.menu) cache[m.dishId] = m.popularity ?? 1;
@@ -234,6 +235,19 @@ export class EventEditorPage {
   }
   markDirty() {
     /* reserved for future UX */
+  }
+
+  segGuests = (key: GuestTypes) => this.local.segments.find((s) => s.key === key)?.guests ?? 0;
+
+  setSegGuests(id: string, key: GuestTypes, value: number) {
+    const n = Math.max(0, Number(value) || 0);
+    this.local.segments = this.local.segments.map((s) => (s.key === key ? { ...s, guests: n } : s));
+    this.onSegmentsChange(id);
+  }
+
+  private ensureAllSegments() {
+    const map = new Map(this.local.segments.map((s) => [s.key, Number(s.guests) || 0]));
+    this.local.segments = this.GuestTypes.map((k) => ({ key: k, guests: map.get(k) ?? 0 }));
   }
 
   private toDisplayTotals(rows: TotalCalcRow[]) {

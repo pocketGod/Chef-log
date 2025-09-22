@@ -13,37 +13,32 @@
       </label>
 
       <h3 class="ee-seg__title">Segments</h3>
-      <table class="table ee-seg__table">
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Guests</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (s of local.segments; track s.key) {
-          <tr>
-            <td>
-              <select [(ngModel)]="s.key" (ngModelChange)="onSegmentsChange(e.id!)">
-                <option *ngFor="let t of allowedTypesFor(s)" [ngValue]="t">{{ t }}</option>
-              </select>
-            </td>
-            <td>
-              <input
-                type="number"
-                min="0"
-                [(ngModel)]="s.guests"
-                (ngModelChange)="onSegmentsChange(e.id!)"
-              />
-            </td>
-            <td class="ee-end">
-              <button class="btn btn-ghost" (click)="removeSegment(e.id!, s.key)">✕</button>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
+<table class="table ee-seg__table">
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Guests</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (t of GuestTypes; track t) {
+      <tr>
+        <td class="ee-seg__label">{{ t | titlecase }}</td>
+        <td>
+          <input
+            type="number"
+            min="0"
+            [ngModel]="segGuests(t)"
+            (ngModelChange)="setSegGuests(e.id!, t, $event)"
+          />
+        </td>
+        <td></td>
+      </tr>
+    }
+  </tbody>
+</table>
+
 
       @if (remainingTypes().length !== 0) {
       <button class="btn ee-seg__add" (click)="addSegment(e.id!)">➕ Add Segment</button>
@@ -117,7 +112,7 @@
       </div>
 
       @if (isCalcBusy) {
-      <p class="muted">Calculating totals…</p>
+        <app-loader></app-loader>
       } @else if (!totals.length) {
       <p class="muted">No ingredients to show yet.</p>
       } @else {
