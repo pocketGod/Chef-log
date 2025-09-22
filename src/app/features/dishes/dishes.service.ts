@@ -27,4 +27,9 @@ export class DishesService {
   remove(id: string) {
     return this.db.remove(`dishes/${id}`);
   }
+
+
+  getMany(ids: string[]) {
+    return Promise.all(ids.map(id => this.db.get<Dish>(`dishes/${id}`))).then(list => list.filter(Boolean) as WithId<Dish>[]);
+  }
 }

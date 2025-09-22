@@ -19,9 +19,18 @@ export interface Dish {
 
 
 export interface DishIngredient {
-  name: string;
+  ingredientId?: string;       
+  ingredientName?: string;     // denormalized for quick display
   unit: Unit;
   qtyPerPortion: number;
 }
 
 
+export interface Ingredient {
+  id?: string;
+  name: string;          // display
+  name_lc: string;       // for prefix search
+  defaultUnit?: Unit;    // optional UX helper
+  tags?: string[];
+  createdAt: number;
+}

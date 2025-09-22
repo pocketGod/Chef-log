@@ -58,46 +58,70 @@
         </div>
       </section>
 
-      <!-- Ingredients -->
-      <section class="card">
-        <div style="display:flex; align-items:center; justify-content:space-between;">
-          <h3>Ingredients</h3>
-          <button class="btn" (click)="addIng()">➕ Add Ingredient</button>
-        </div>
+<!-- Ingredients -->
+<section class="card">
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <h3>Ingredients</h3>
+    <button class="btn" (click)="addIng()">➕ Add Ingredient</button>
+  </div>
 
-        <table class="table" style="width:100%; border-collapse: collapse; margin-top:.5rem;">
-          <thead>
-            <tr>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Name</th>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Unit</th>
-              <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Qty/Portion</th>
-              <th style="padding:.5rem; border-bottom:1px solid var(--color-border);"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (ing of local.ingredients; track ing.name + '_' + ing.unit) {
-              <tr>
-                <td style="padding:.5rem;"><input [(ngModel)]="ing.name" (ngModelChange)="markDirty()" /></td>
-                <td style="padding:.5rem;">
-                  <select [(ngModel)]="ing.unit" (ngModelChange)="markDirty()">
-                    <option value="g">g</option>
-                    <option value="kg">kg</option>
-                    <option value="ml">ml</option>
-                    <option value="l">l</option>
-                    <option value="pcs">pcs</option>
-                  </select>
-                </td>
-                <td style="padding:.5rem;">
-                  <input type="number" step="0.01" min="0" [(ngModel)]="ing.qtyPerPortion" (ngModelChange)="markDirty()" />
-                </td>
-                <td style="padding:.5rem; text-align:right;">
-                  <button class="btn" (click)="removeIng(ing)">✕</button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </section>
+  <table class="table" style="width:100%; border-collapse: collapse; margin-top:.5rem;">
+    <thead>
+      <tr>
+        <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Name</th>
+        <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Unit</th>
+        <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Qty/Portion</th>
+        <th style="padding:.5rem; border-bottom:1px solid var(--color-border);"></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (ing of local.ingredients; track ing.ingredientId + '_' + ing.unit) {
+        <tr>
+          <!-- NAME CELL using datalist -->
+          <td style="padding:.5rem; position:relative;">
+            <input
+              [(ngModel)]="ing.ingredientName"
+              (ngModelChange)="onIngNameChange(ing, $event)"
+              placeholder="Search or add..."
+              style="width:100%;"
+              [attr.list]="'ingredient-options-' + (ing.ingredientId || 'new')"
+            />
+            <datalist [id]="'ingredient-options-' + (ing.ingredientId || 'new')">
+              @for (opt of suggest; track opt.id) {
+                <option [value]="opt.name">{{opt.name}}</option>
+              }
+            </datalist>
+          </td>
+
+          <!-- UNIT -->
+          <td style="padding:.5rem;">
+            <select [(ngModel)]="ing.unit" (ngModelChange)="markDirty()">
+              <option value="g">g</option>
+              <option value="kg">kg</option>
+              <option value="ml">ml</option>
+              <option value="l">l</option>
+              <option value="pcs">pcs</option>
+            </select>
+          </td>
+
+          <!-- QTY -->
+          <td style="padding:.5rem;">
+            <input type="number" step="0.01" min="0"
+                   [(ngModel)]="ing.qtyPerPortion"
+                   (ngModelChange)="markDirty()" />
+          </td>
+
+          <!-- REMOVE -->
+          <td style="padding:.5rem; text-align:right;">
+            <button class="btn" (click)="removeIng(ing)">✕</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
+
+
 
       <div style="display:flex; gap:.5rem;">
         <button class="btn btn-primary" (click)="save()">Save</button>

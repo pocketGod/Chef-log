@@ -7,35 +7,35 @@ import { DishesService } from '../../dishes/dishes.service';
 import { EventMenuItem, EventSegment } from '../../../shared/models/event.model';
 import { Dish } from '../../../shared/models/dish.model';
 import { Diet, GuestTypes } from '../../../shared/models/common.model';
+import { TotalCalcRow } from '../../../shared/models/calc.model';
+import { aggregateIngredients } from '../../../shared/Utils/calc';
+import { IngredientsService } from '../../dishes/ingredient.service';
 
 @Component({
   selector: 'app-event-editor',
   standalone: true,
   imports: [AsyncPipe, FormsModule, CommonModule, RouterLink],
-  templateUrl:'event-editor.page.html'
+  templateUrl: 'event-editor.page.html',
 })
 export class EventEditorPage {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private events = inject(EventsService);
   private dishesSvc = inject(DishesService);
+  private ingSvc = inject(IngredientsService);
 
   // route
   eventId = this.route.snapshot.paramMap.get('id')!;
   event$ = this.events.get$(this.eventId);
   dishes$ = this.dishesSvc.list$();
-  GuestTypes: GuestTypes[] = [
-    'adult',
-    'kid',
-    'vegan',
-    'vegeterian',
-  ];
+  GuestTypes: GuestTypes[] = ['adult', 'kid', 'vegan', 'vegeterian'];
 
   // ---- stable dish lookup: id -> { name, bpp }
   private _dishInfo = signal<
     Record<string, { name: string; bpp: number; diet: string; kid?: boolean }>
   >({});
   private _dishInfoComputed = computed(() => this._dishInfo());
+
 
   // helpers for template
   dishName = (id: string) => this._dishInfoComputed()[id]?.name ?? 'Dish';
@@ -47,10 +47,15 @@ export class EventEditorPage {
     segments: [] as EventSegment[],
     menu: [] as EventMenuItem[],
   };
+  displayTotals: Array<{ name: string; amount: string }> = [];
 
   // local popularity cache to keep slider smooth
   private _pop = signal<Record<string, number>>({}); // dishId -> popularity
   localPopularity = (dishId: string) => this._pop()[dishId] ?? 1;
+
+  // totals (ingredients)
+  totals: TotalCalcRow[] = [];
+  isCalcBusy = false;
 
   constructor() {
     // hydrate local from event once and on updates
@@ -75,6 +80,9 @@ export class EventEditorPage {
         const cache: Record<string, number> = {};
         for (const m of this.local.menu) cache[m.dishId] = m.popularity ?? 1;
         this._pop.set(cache);
+
+        // recalc totals when event loads/changes
+        this.recalcTotals();
       });
     });
 
@@ -114,6 +122,7 @@ export class EventEditorPage {
   onSegmentsChange(id: string) {
     this.local.segments = [...this.local.segments]; // bump ref
     this.events.setSegments(id, this.local.segments);
+    this.recalcTotals();
   }
 
   // --- menu / popularity
@@ -128,11 +137,13 @@ export class EventEditorPage {
       delete p[dishId];
       this._pop.set(p);
       this.events.update(id, { menu: this.local.menu });
+      this.recalcTotals();
       return;
     }
     if (!this.hasDish(dishId)) {
       this.local.menu = [...this.local.menu, { dishId, popularity: this.localPopularity(dishId) }];
       this.events.update(id, { menu: this.local.menu });
+      this.recalcTotals();
     }
   }
 
@@ -147,6 +158,7 @@ export class EventEditorPage {
     const next = this.local.menu.map((m) => (m.dishId === dishId ? { ...m, popularity: p } : m));
     this.local.menu = next;
     this.events.update(id, { menu: next });
+    this.recalcTotals();
   }
 
   computePortions(dishId: string, popularity: number) {
@@ -163,13 +175,86 @@ export class EventEditorPage {
     return totalPortions * pop * bpp;
   }
 
-  // --- misc
+  async recalcTotals() {
+  const ids = (this.local.menu ?? []).map(m => m.dishId);
+  if (!ids.length) { this.totals = []; return; }
+  this.isCalcBusy = true;
+  try {
+    const dishes = await this.dishesSvc.getMany(ids);
+
+    // collect unique ingredient ids from these dishes
+    const ingIds = Array.from(new Set(
+      dishes.flatMap(d => (d.ingredients ?? []).map(r => r.ingredientId).filter(Boolean) as string[])
+    ));
+
+    const nameById: Record<string, string> = {};
+    for (const id of ingIds) {
+      const doc = await this.ingSvc.getById(id);
+      if (doc) nameById[id] = (doc as any).name || '';
+    }
+
+    const evtLike = {
+      segments: this.local.segments,
+      menu: this.local.menu.map(m => ({ dishId: m.dishId, popularity: this.localPopularity(m.dishId) })),
+    } as any;
+
+    this.totals = aggregateIngredients(dishes as any, evtLike, nameById);
+    (this as any).displayTotals = this.toDisplayTotals(this.totals);
+
+  } finally {
+    this.isCalcBusy = false;
+  }
+}
+
+
   saveName(id: string) {
     this.events.update(id, { name: this.local.name.trim() || 'Untitled Event' });
   }
   markDirty() {
     /* reserved for future UX */
   }
+
+
+  private toDisplayTotals(rows: TotalCalcRow[]) {
+  // group by name, sum per base family
+  const byName: Record<string, { g: number; ml: number; pcs: number }> = {};
+
+  for (const r of rows) {
+    const k = r.name || 'Unnamed';
+    byName[k] ||= { g: 0, ml: 0, pcs: 0 };
+
+    switch (r.unit) {
+      case 'kg': byName[k].g  += r.qty * 1000; break;
+      case 'g':  byName[k].g  += r.qty;        break;
+      case 'l':  byName[k].ml += r.qty * 1000; break;
+      case 'ml': byName[k].ml += r.qty;        break;
+      case 'pcs':byName[k].pcs+= r.qty;        break;
+    }
+  }
+
+  // compact and build display string
+  const out = Object.entries(byName).map(([name, sums]) => {
+    const parts: string[] = [];
+
+    if (sums.pcs > 0) parts.push(`${this.formatNum(sums.pcs)} pcs`);
+    if (sums.g   > 0) parts.push(
+      sums.g >= 1000 ? `${this.formatNum(sums.g / 1000)} kg` : `${this.formatNum(sums.g)} g`
+    );
+    if (sums.ml  > 0) parts.push(
+      sums.ml >= 1000 ? `${this.formatNum(sums.ml / 1000)} l` : `${this.formatNum(sums.ml)} ml`
+    );
+
+    return { name, amount: parts.join(' + ') || '—' };
+  });
+
+  // stable order
+  return out.sort((a,b) => a.name.localeCompare(b.name));
+}
+
+// tiny number formatter to match your table pipe
+private formatNum(n: number) {
+  return Number.isFinite(n) ? Number(n.toFixed(2)).toString().replace(/\.00$/,'') : '0';
+}
 
   private segMultiplier(segKey: string) {
     // need to tweak

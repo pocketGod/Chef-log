@@ -89,6 +89,34 @@
             </li>
           }
         </ul>
+
+        <h4 style="margin-top:1rem; display:flex; align-items:center; justify-content:space-between;">
+          <span>Total ingredients</span>
+          <button class="btn" (click)="recalcTotals()">↻ Recalculate</button>
+        </h4>
+
+        @if (isCalcBusy) {
+          <p class="muted">Calculating totals…</p>
+        } @else if (!totals?.length) {
+          <p class="muted">No ingredients to show yet.</p>
+        } @else {
+          <table class="table" style="width:100%; border-collapse:collapse; margin-top:.5rem;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:.5rem; border-bottom:1px solid var(--color-border);">Ingredient</th>
+                <th style="text-align:right; padding:.5rem; border-bottom:1px solid var(--color-border);">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of displayTotals; track t.name) {
+                <tr>
+                  <td style="padding:.5rem;">{{ t.name }}</td>
+                  <td style="padding:.5rem; text-align:right;">{{ t.amount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
     </section>
   } @else {
