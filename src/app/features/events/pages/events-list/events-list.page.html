@@ -1,8 +1,13 @@
 <div class="page container">
-  <h1 class="page__title">Events <span class="badge">overview</span></h1>
+  <h1 class="page__title">
+  {{ 'events.title' | localize }}
+  <span class="badge">{{ 'events.badge.overview' | localize }}</span>
+</h1>
 
   <div class="event-list__toolbar">
-    <button class="btn btn-primary" (click)="create()">➕ Create Event</button>
+    <button class="btn btn-primary" (click)="create()">
+    {{ 'events.create' | localize }}
+  </button>
   </div>
 
   @if (events$ | async; as events) { @if (events.length > 0) {
@@ -16,17 +21,17 @@
         </div>
 
         <div class="event-card__actions">
-          <a class="btn btn-ghost" [routerLink]="['/events', e.id]">Open</a>
-          <button class="btn" (click)="remove(e.id!)">Delete</button>
+          <a class="btn btn-ghost" [routerLink]="['/events', e.id]">{{ 'event.card.open' | localize }}</a>
+          <button class="btn" (click)="remove(e.id!)">{{ 'event.card.delete' | localize }}</button>
         </div>
       </div>
 
       <div class="event-card__segments" *ngIf="e.segments?.length">
-        <span class="muted">Segments:</span>
+        <span class="muted">{{ 'event.card.segments' | localize }}</span>
         <div class="segments">
           @for (s of e.segments; track s.key) {
           <span class="segment" [ngClass]="'segment--' + s.key">
-            <span class="segment__key">{{ s.key }}</span>
+            <span class="segment__key">{{ ('segment.' + s.key) | localize }}</span>
             <span class="segment__count">{{ s.guests }}</span>
           </span>
           }

@@ -1,14 +1,17 @@
 <div class="page container">
-  <h1 class="page__title">Dishes <span class="badge">catalog</span></h1>
+  <h1 class="page__title">
+    {{ 'dishes.title' | localize }}
+  <span class="badge">{{ 'dishes.badge.catalog' | localize }}</span>
+  </h1>
 
   <div class="layout layout--reverse">
     <aside class="layout__side">
-      <button class="btn btn-primary" (click)="createDish()">➕ Create Dish</button>
+      <button class="btn btn-primary" (click)="createDish()">{{ 'dishes.create' | localize }}</button>
 
       <div class="filters card">
         <div class="filters__header">
-          <div class="filters__title">Filters</div>
-          <button class="btn btn-ghost" (click)="clearFilters()">Clear</button>
+          <div class="filters__title">{{ 'filters.title' | localize }}</div>
+          <button class="btn btn-ghost" (click)="clearFilters()">{{ 'filters.clear' | localize }}</button>
         </div>
 
         <div class="filters__search">
@@ -29,7 +32,7 @@
           <input
             class="filters__input"
             type="search"
-            placeholder="Search dishes…"
+            [placeholder]="'filters.search.placeholder' | localize"
             (input)="setSearch($event.target.value)"
           />
         </div>
@@ -42,11 +45,11 @@
         </div>
 
         <div class="filters__section">
-          <div class="filters__label">Guest types</div>
+          <div class="filters__label">{{ 'filters.guestTypes' | localize }}</div>
           <div class="filters__grid">
             <app-check
               *ngFor="let t of GuestTypes"
-              [label]="t"
+              [label]="'guestType.'+t"
               [checked]="selectedGuest$.value.has(t)"
               (checkedChange)="toggleGuest(t)"
             />
@@ -54,11 +57,11 @@
         </div>
 
         <div class="filters__section">
-          <div class="filters__label">Diet</div>
+          <div class="filters__label">{{ 'filters.diet' | localize }}</div>
           <div class="filters__grid">
             <app-check
               *ngFor="let d of Diets"
-              [label]="d"
+              [label]="'diet.'+d"
               [checked]="selectedDiet$.value.has(d)"
               (checkedChange)="toggleDiet(d)"
             />
@@ -77,12 +80,12 @@
             <div class="dish-card__titleRow">
               <h3 class="dish-card__title">{{ d.name }}</h3>
               <div class="dish-card__tags">
-                <span class="tag" [ngClass]="'tag--diet-' + (d.diet || 'meat')">{{ d.diet }}</span>
-                <span class="tag tag--warn" *ngIf="d.kidFriendly === false">not kid friendly</span>
+                <span class="tag" [ngClass]="'tag--diet-' + (d.diet || 'meat')"> {{ ('diet.' + (d.diet || 'meat')) | localize }}</span>
+                <span class="tag tag--warn" *ngIf="d.kidFriendly === false"> {{ 'dish.tags.notKidFriendly' | localize }}</span>
               </div>
             </div>
 
-            <a class="btn btn-ghost dish-card__action" [routerLink]="['/dishes', d.id]">Edit</a>
+            <a class="btn btn-ghost dish-card__action" [routerLink]="['/dishes', d.id]">{{ 'dish.edit' | localize }}</a>
           </div>
 
           <p class="dish-card__desc" *ngIf="d.description">{{ d.description }}</p>
@@ -90,7 +93,7 @@
         }
       </ul>
       } @else {
-      <p class="muted results__empty">No dishes match your filters.</p>
+      <p class="muted results__empty">{{ 'results.empty' | localize }}</p>
       }
     </section>
     } @else {

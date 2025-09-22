@@ -4,12 +4,13 @@ import { FirestoreService, WithId } from '../../../../core/data/firestore.servic
 import { EventDoc } from '../../../../shared/models/event.model';
 import { Router, RouterLink } from '@angular/router';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { LocalizePipe } from '../../../../shared/pipes/localize.pipe';
 
 
 @Component({
   selector: 'app-events-list',
   standalone: true,
-  imports: [AsyncPipe, DatePipe, RouterLink, CommonModule, LoaderComponent],
+  imports: [AsyncPipe, DatePipe, RouterLink, CommonModule, LoaderComponent, LocalizePipe],
   templateUrl:'events-list.page.html',
   styleUrl:'events-list.page.scss'
 })

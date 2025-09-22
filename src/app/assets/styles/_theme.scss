@@ -5,6 +5,13 @@ body {
   background-color: var(--blue-100);
   padding: 0;
   margin: 0;
+  direction: rtl;
+
+
+}
+
+.page {
+  padding: 1rem;
 }
 
 .container {

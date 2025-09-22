@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { LocalizePipe } from '../../pipes/localize.pipe';
 
 let uid = 0;
 
@@ -16,10 +17,11 @@ let uid = 0;
       />
       <label [for]="id"></label>
     </div>
-    <span class="check__label">{{ label }}</span>
+    <span class="check__label">{{ label|localize }}</span>
   </div>
   `,
-  styleUrls: ['./check.component.scss']
+  styleUrls: ['./check.component.scss'],
+  imports:[LocalizePipe]
 })
 export class CheckComponent {
   @Input() label = '';

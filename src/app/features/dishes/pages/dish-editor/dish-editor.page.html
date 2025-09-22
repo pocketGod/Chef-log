@@ -1,6 +1,9 @@
 <div class="page container">
-  <a class="btn btn-ghost" routerLink="/dishes">← Back to Dishes</a>
-  <h1 class="page__title">Dish Editor <span class="badge">setup</span></h1>
+  <a class="btn btn-ghost" routerLink="/dishes">{{ 'dishEditor.back' | localize }}</a>
+  <h1 class="page__title">
+  {{ 'dishEditor.title' | localize }}
+  <span class="badge">{{ 'dishEditor.badge.setup' | localize }}</span>
+</h1>
 
   @if (dish$ | async; as d) {
     <div class="editor">
@@ -9,20 +12,20 @@
       <div class="editor__left">
         <!-- Basics -->
         <section class="card editor__card">
-          <h3>Basics</h3>
+          <h3>{{ 'dishEditor.basics.title' | localize }}</h3>
           <div class="form-grid">
             <label class="field">
-              <span class="field__label">Name</span>
+              <span class="field__label">{{ 'dishEditor.basics.name' | localize }}</span>
               <input [(ngModel)]="local.name" (blur)="save()" />
             </label>
 
             <label class="field">
-              <span class="field__label">Description</span>
+              <span class="field__label">{{ 'dishEditor.basics.description' | localize }}</span>
               <textarea
                 [(ngModel)]="local.description"
                 (blur)="save()"
                 rows="3"
-                placeholder="Short notes about this dish (allergens, serving style, etc.)"
+                [placeholder]=" 'dishEditor.basics.description.placeholder' | localize"
               ></textarea>
             </label>
           </div>
@@ -30,10 +33,10 @@
 
         <!-- Serving & Suitability -->
         <section class="card editor__card">
-          <h3>Serving &amp; Suitability</h3>
+          <h3>{{ 'dishEditor.serving.title' | localize }}</h3>
           <div class="form-grid form-grid--two">
             <label class="field">
-              <span class="field__label">Base portions per person</span>
+              <span class="field__label">{{ 'dishEditor.serving.basePortions' | localize }}</span>
               <input
                 type="number"
                 step="0.1"
@@ -44,18 +47,19 @@
             </label>
 
             <label class="field">
-              <span class="field__label">Diet</span>
+              <span class="field__label">{{ 'dishEditor.diet' | localize }}</span>
               <select [(ngModel)]="local.diet" (change)="save()">
-                <option value="meat">Meat</option>
-                <option value="seafood">Seafood</option>
-                <option value="vegeterian">Vegeterian</option>
-                <option value="vegan">Vegan</option>
+                <option value="meat">{{ 'dishEditor.diet.meat' | localize }}</option>
+                <option value="dairy">{{ 'dishEditor.diet.dairy' | localize }}</option>
+                <option value="seafood">{{ 'dishEditor.diet.seafood' | localize }}</option>
+                <option value="vegeterian">{{ 'dishEditor.diet.vegeterian' | localize }}</option>
+                <option value="vegan">{{ 'dishEditor.diet.vegan' | localize }}</option>
               </select>
             </label>
 
             <div class="field field--inline field--span-2">
               <app-check
-                [label]="'Kid friendly'"
+                [label]="'dishEditor.serving.kidFriendly' | localize"
                 [checked]="local.kidFriendly !== false"
                 (checkedChange)="setKidFriendly($event)"
               />
@@ -68,16 +72,18 @@
       <aside class="editor__right">
         <section class="card editor__card">
           <div class="section-header">
-            <h3>Ingredients</h3>
-            <button class="btn" (click)="addIng()">➕ Add Ingredient</button>
+            <h3>{{ 'dishEditor.ingredients.title' | localize }}</h3>
+            <button class="btn" (click)="addIng()">
+            {{ 'dishEditor.ingredients.add' | localize }}
+          </button>
           </div>
 
           <table class="table ingredients">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Unit</th>
-                <th>Qty/Portion</th>
+                <th>{{ 'dishEditor.ingredients.table.name' | localize }}</th>
+                <th>{{ 'dishEditor.ingredients.table.unit' | localize }}</th>
+                <th>{{ 'dishEditor.ingredients.table.qty' | localize }}</th>
                 <th></th>
               </tr>
             </thead>
@@ -89,7 +95,7 @@
                     <input
                       [(ngModel)]="ing.ingredientName"
                       (ngModelChange)="onIngNameChange(ing, $event)"
-                      placeholder="Search or add..."
+                       [placeholder]="'dishEditor.ingredients.search.placeholder' | localize"
                       [attr.list]="'ingredient-options-' + (ing.ingredientId || 'new')"
                     />
                     <datalist [id]="'ingredient-options-' + (ing.ingredientId || 'new')">
@@ -102,11 +108,11 @@
                   <!-- UNIT -->
                   <td>
                     <select [(ngModel)]="ing.unit" (ngModelChange)="markDirty()">
-                      <option value="g">g</option>
-                      <option value="kg">kg</option>
-                      <option value="ml">ml</option>
-                      <option value="l">l</option>
-                      <option value="pcs">pcs</option>
+                      <option value="g">{{ 'common.units.g' | localize }}</option>
+                      <option value="kg">{{ 'common.units.kg' | localize }}</option>
+                      <option value="ml">{{ 'common.units.ml' | localize }}</option>
+                      <option value="l">{{ 'common.units.l' | localize }}</option>
+                      <option value="pcs">{{ 'common.units.pcs' | localize }}</option>
                     </select>
                   </td>
 
@@ -134,7 +140,7 @@
 
       <!-- ACTIONS -->
       <div class="editor__actions">
-        <button class="btn btn-primary" (click)="save()" routerLink="/dishes">Save</button>
+        <button class="btn btn-primary" (click)="save()" routerLink="/dishes">{{ 'dishEditor.actions.save' | localize }}</button>
       </div>
     </div>
  } @else {

@@ -1,7 +1,7 @@
 <header class="navbar">
   <div class="navbar__container">
     <div class="navbar__brand">
-      <a routerLink="/" class="navbar__logo">🍽️ Chef Log</a>
+      <a routerLink="/" class="navbar__logo">🍽️ {{ 'app.title' | localize }}</a>
     </div>
 
     <nav class="navbar__links">
@@ -13,7 +13,7 @@
           class="nav-link"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          Dishes
+          {{ 'nav.dishes' | localize }}
         </a>
         <a
           routerLink="/events"
@@ -21,9 +21,9 @@
           class="nav-link"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          Events
+          {{ 'nav.events' | localize }}
         </a>
-        <a class="nav-link" (click)="logout()">Logout</a>
+        <a class="nav-link" (click)="logout()">{{ 'nav.logout' | localize }}</a>
       }
     </nav>
 

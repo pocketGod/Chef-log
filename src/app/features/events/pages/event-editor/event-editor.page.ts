@@ -12,11 +12,13 @@ import { aggregateIngredients } from '../../../../shared/Utils/calc';
 import { IngredientsService } from '../../../dishes/ingredient.service';
 import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { LocalizePipe } from '../../../../shared/pipes/localize.pipe';
+import { TranslationService } from '../../../../shared/services/translation.service';
 
 @Component({
   selector: 'app-event-editor',
   standalone: true,
-  imports: [AsyncPipe, FormsModule, CommonModule, RouterLink, CheckComponent, LoaderComponent],
+  imports: [AsyncPipe, FormsModule, CommonModule, RouterLink, CheckComponent, LoaderComponent, LocalizePipe],
   templateUrl: 'event-editor.page.html',
   styleUrl: 'event-editor.page.scss',
 })
@@ -26,6 +28,7 @@ export class EventEditorPage {
   private events = inject(EventsService);
   private dishesSvc = inject(DishesService);
   private ingSvc = inject(IngredientsService);
+  private translationSvc = inject(TranslationService);
 
   // route
   eventId = this.route.snapshot.paramMap.get('id')!;
@@ -250,8 +253,11 @@ export class EventEditorPage {
     this.local.segments = this.GuestTypes.map((k) => ({ key: k, guests: map.get(k) ?? 0 }));
   }
 
+  private u(u: 'kg' | 'g' | 'ml' | 'l' | 'pcs') {
+    return this.translationSvc.t(`common.units.${u}`);
+  }
+
   private toDisplayTotals(rows: TotalCalcRow[]) {
-    // group by name, sum per base family
     const byName: Record<string, { g: number; ml: number; pcs: number }> = {};
 
     for (const r of rows) {
@@ -259,42 +265,35 @@ export class EventEditorPage {
       byName[k] ||= { g: 0, ml: 0, pcs: 0 };
 
       switch (r.unit) {
-        case 'kg':
-          byName[k].g += r.qty * 1000;
-          break;
-        case 'g':
-          byName[k].g += r.qty;
-          break;
-        case 'l':
-          byName[k].ml += r.qty * 1000;
-          break;
-        case 'ml':
-          byName[k].ml += r.qty;
-          break;
-        case 'pcs':
-          byName[k].pcs += r.qty;
-          break;
+        case 'kg': byName[k].g  += r.qty * 1000; break;
+        case 'g':  byName[k].g  += r.qty;        break;
+        case 'l':  byName[k].ml += r.qty * 1000; break;
+        case 'ml': byName[k].ml += r.qty;        break;
+        case 'pcs':byName[k].pcs+= r.qty;        break;
       }
     }
 
-    // compact and build display string
+    const nbsp = '\u202F'; // thin NBSP keeps number + unit together and looks right in RTL
     const out = Object.entries(byName).map(([name, sums]) => {
       const parts: string[] = [];
 
-      if (sums.pcs > 0) parts.push(`${this.formatNum(sums.pcs)} pcs`);
+      if (sums.pcs > 0) parts.push(`${this.formatNum(sums.pcs)}${nbsp}${this.u('pcs')}`);
       if (sums.g > 0)
         parts.push(
-          sums.g >= 1000 ? `${this.formatNum(sums.g / 1000)} kg` : `${this.formatNum(sums.g)} g`
+          sums.g >= 1000
+            ? `${this.formatNum(sums.g / 1000)}${nbsp}${this.u('kg')}`
+            : `${this.formatNum(sums.g)}${nbsp}${this.u('g')}`
         );
       if (sums.ml > 0)
         parts.push(
-          sums.ml >= 1000 ? `${this.formatNum(sums.ml / 1000)} l` : `${this.formatNum(sums.ml)} ml`
+          sums.ml >= 1000
+            ? `${this.formatNum(sums.ml / 1000)}${nbsp}${this.u('l')}`
+            : `${this.formatNum(sums.ml)}${nbsp}${this.u('ml')}`
         );
 
       return { name, amount: parts.join(' + ') || '—' };
     });
 
-    // stable order
     return out.sort((a, b) => a.name.localeCompare(b.name));
   }
 
@@ -319,7 +318,7 @@ export class EventEditorPage {
       return diet === 'vegan';
     }
     if (segKey === 'vegeterian') {
-      return diet === 'vegan' || diet === 'vegeterian' || diet === 'seafood';
+      return diet === 'vegan' || diet === 'vegeterian' || diet === 'seafood' || diet ==='dairy' ;
     }
     if (segKey === 'kid') {
       return info.kid !== false; // exclude if explicitly not kid-friendly

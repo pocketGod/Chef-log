@@ -3,11 +3,12 @@ import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/ro
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
 import { AuthService } from '../../../core/auth/auth.service';
+import { LocalizePipe } from '../../pipes/localize.pipe';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, LocalizePipe],
   templateUrl: 'navbar.component.html',
   styleUrls: ['navbar.component.scss']
 })

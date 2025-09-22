@@ -11,11 +11,12 @@ import { Diet, Unit } from '../../../../shared/models/common.model';
 import { IngredientsService } from '../../ingredient.service';
 import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { LocalizePipe } from '../../../../shared/pipes/localize.pipe';
 
 @Component({
   selector: 'app-dish-editor',
   standalone: true,
-  imports: [AsyncPipe, FormsModule, RouterLink, CheckComponent, LoaderComponent],
+  imports: [AsyncPipe, FormsModule, RouterLink, CheckComponent, LoaderComponent, LocalizePipe],
   templateUrl: 'dish-editor.page.html',
   styleUrls: ['./dish-editor.page.scss'],
 })

@@ -1,15 +1,19 @@
 import { Component, inject, effect } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { LocalizePipe } from '../../../shared/pipes/localize.pipe';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   template: `
-    <h1>Login</h1>
-    <p>Sign in with your Google account.</p>
-    <button (click)="google()">Sign in with Google</button>
-  `
+  <div class="page">
+    <h1>{{ 'login.title' | localize }}</h1>
+    <p>{{ 'login.signInPrompt' | localize }}</p>
+    <button class="btn" (click)="google()"> {{ 'login.signInGoogle' | localize }}</button>
+  </div>
+  `,
+  imports:[LocalizePipe]
 })
 export class LoginPage {
   private auth = inject(AuthService);

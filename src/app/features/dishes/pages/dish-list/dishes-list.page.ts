@@ -9,11 +9,12 @@ import { Dish } from '../../../../shared/models/dish.model';
 import { Diet, GuestTypes } from '../../../../shared/models/common.model';  
 import { CheckComponent } from '../../../../shared/components/checkbox/check.component';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { LocalizePipe } from '../../../../shared/pipes/localize.pipe';
 
 @Component({
   selector: 'app-dishes-list',
   standalone: true,
-  imports: [AsyncPipe, RouterLink, FormsModule, CommonModule, CheckComponent, LoaderComponent],            
+  imports: [AsyncPipe, RouterLink, FormsModule, CommonModule, CheckComponent, LoaderComponent, LocalizePipe],            
   templateUrl: 'dishes-list.page.html',
    styleUrls: ['dishes-list.page.scss']
 })
@@ -28,7 +29,7 @@ export class DishesListPage {
   selectedDiet$  = new BehaviorSubject<Set<Diet>>(new Set());
 
   GuestTypes: GuestTypes[] = ['adult', 'kid', 'vegan', 'vegeterian'];
-  Diets: Diet[] = ['vegan', 'vegeterian', 'seafood', 'meat'];
+  Diets: Diet[] = ['vegan', 'vegeterian', 'seafood', 'meat', 'dairy'];
 
   Array = Array
 
@@ -48,7 +49,7 @@ export class DishesListPage {
         if (gt === 'adult') return true;
         if (gt === 'kid')   return d.kidFriendly !== false;
         if (gt === 'vegan') return diet === 'vegan';
-        if (gt === 'vegeterian') return diet === 'vegan' || diet === 'vegeterian' || diet === 'seafood';
+        if (gt === 'vegeterian') return diet === 'vegan' || diet === 'vegeterian' || diet === 'seafood' || diet == 'dairy';
         return true;
       };
 

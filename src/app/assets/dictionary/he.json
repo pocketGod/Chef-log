@@ -1,0 +1,117 @@
+{
+  "app.title": "מחשבון השף",
+  "login.title": "התחברות",
+    "login.signInPrompt": "היכנס באמצעות חשבון Google שלך.",
+  "login.signInGoogle": "התחבר עם Google",
+  
+  "common.save": "שמירה",
+  "common.cancel": "ביטול",
+    "common.units.g": "גרם",
+  "common.units.kg": "ק״ג",
+  "common.units.ml": "מ״ל",
+  "common.units.l": "ליטר",
+  "common.units.pcs": "יח׳",
+
+  "nav.dishes": "מנות",
+  "nav.events": "אירועים",
+  "nav.logout": "התנתקות",
+
+  "dishes.title": "מנות",
+  "dishes.badge.catalog": "קטלוג",
+  "dishes.create": "➕ צור מנה",
+    "dish.tags.notKidFriendly": "לא ידידותי לילדים",
+    "dish.edit": "עריכה",
+
+     "dishEditor.back": "← חזרה למנות",
+  "dishEditor.title": "עורך מנה",
+  "dishEditor.badge.setup": "הגדרות",
+
+  "dishEditor.basics.title": "בסיס",
+  "dishEditor.basics.name": "שם",
+  "dishEditor.basics.description": "תיאור",
+  "dishEditor.basics.description.placeholder": "הערות קצרות על המנה (אלרגנים, סגנון הגשה וכו')",
+
+  "dishEditor.serving.title": "הגשה והתאמה",
+  "dishEditor.serving.basePortions": "מנות בסיס לאדם",
+  "dishEditor.serving.diet": "תזונה",
+  "dishEditor.serving.kidFriendly": "ידידותי לילדים",
+
+  "dishEditor.diet": "קטגוריה",
+  "dishEditor.diet.meat": "בשרי",
+  "dishEditor.diet.dairy": "חלבי",
+  "dishEditor.diet.seafood": "דגים/ים",
+  "dishEditor.diet.vegeterian": "צמחוני",
+  "dishEditor.diet.vegan": "טבעוני",
+
+  "dishEditor.ingredients.title": "מרכיבים",
+  "dishEditor.ingredients.add": "➕ הוסף מרכיב",
+  "dishEditor.ingredients.table.name": "שם",
+  "dishEditor.ingredients.table.unit": "יחידה",
+  "dishEditor.ingredients.table.qty": "כמות/מנה",
+  "dishEditor.ingredients.table.remove": "✕",
+
+  "dishEditor.ingredients.search.placeholder": "חפש או הוסף...",
+
+
+
+  "dishEditor.actions.save": "שמירה",
+
+  "filters.title": "מסננים",
+  "filters.clear": "נקה",
+  "filters.search.placeholder": "חיפוש מנות…",
+  "filters.guestTypes": "סוגי אורחים",
+  "filters.diet": "תזונה",
+  "results.empty": "אין מנות התואמות למסננים.",
+
+  "guestType.adult": "מבוגרים",
+  "guestType.kid": "ילדים",
+  "guestType.vegan": "טבעונים",
+  "guestType.vegeterian": "צמחונים",
+
+  "diet.meat": "בשרי",
+  "diet.dairy": "חלבי",
+  "diet.vegan": "טבעוני",
+  "diet.vegeterian": "צמחוני",
+  "diet.seafood": "אוכל ים",
+
+  "event.editor": "עורך אירוע",
+"events.title": "אירועים",
+  "events.badge.overview": "סקירה",
+  "events.create": "➕ צור אירוע",
+
+  "event.card.open": "פתח",
+  "event.card.delete": "מחק",
+  "event.card.segments": "מקטעים:",
+
+    "eventEditor.back": "← חזרה לאירועים",
+  "eventEditor.title": "עורך אירוע",
+  "eventEditor.badge.planner": "מתכנן",
+
+  "eventEditor.details.title": "פרטים",
+  "eventEditor.details.name": "שם",
+
+  "eventEditor.segments.title": "מקטעים",
+  "eventEditor.segments.table.type": "סוג",
+  "eventEditor.segments.table.guests": "אורחים",
+  "eventEditor.segments.add": "➕ הוסף מקטע",
+
+  "eventEditor.menu.title": "תפריט (פופולריות למנה)",
+  "eventEditor.menu.bpp": "מנות בסיס לאדם",
+  "eventEditor.menu.popularity": "פופולריות",
+
+  "eventEditor.totals.title": "סיכומים",
+  "eventEditor.totals.totalGuests": "סה״כ אורחים",
+  "eventEditor.totals.dishPortions": "מנות לפי מנות",
+  "eventEditor.totals.header.ingredients": "סה״כ מצרכים",
+  "eventEditor.totals.recalculate": "↻ חשב מחדש",
+  "eventEditor.totals.empty": "אין מצרכים להצגה עדיין.",
+
+  "eventEditor.totals.table.ingredient": "מרכיב",
+  "eventEditor.totals.table.amount": "כמות",
+
+  "segment.adult": "מבוגרים",
+  "segment.kid": "ילדים",
+    "segment.vegan": "טבעונים",
+  "segment.vegeterian": "צמחונים"
+
+}

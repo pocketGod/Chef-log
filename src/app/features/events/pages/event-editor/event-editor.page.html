@@ -1,30 +1,33 @@
 <div class="page container">
-  <a class="btn btn-ghost" routerLink="/events">← Back to Events</a>
-  <h1 class="page__title">Event Editor <span class="badge">planner</span></h1>
+  <a class="btn btn-ghost" routerLink="/events">{{ 'eventEditor.back' | localize }}</a>
+  <h1 class="page__title">
+  {{ 'eventEditor.title' | localize }}
+  <span class="badge">{{ 'eventEditor.badge.planner' | localize }}</span>
+</h1>
 
   @if (event$ | async; as e) {
   <section class="ee-grid">
     <!-- LEFT: Details & Segments -->
     <div class="card ee-card ee-col-left">
-      <h3>Details</h3>
+      <h3>{{ 'eventEditor.details.title' | localize }}</h3>
       <label class="field">
-        <span class="field__label">Name</span>
+        <span class="field__label">{{ 'eventEditor.details.name' | localize }}</span>
         <input [(ngModel)]="local.name" (blur)="saveName(e.id!)" />
       </label>
 
-      <h3 class="ee-seg__title">Segments</h3>
+      <h3 class="ee-seg__title">{{ 'eventEditor.segments.title' | localize }}</h3>
 <table class="table ee-seg__table">
   <thead>
     <tr>
-      <th>Type</th>
-      <th>Guests</th>
+    <th>{{ 'eventEditor.segments.table.type' | localize }}</th>
+<th>{{ 'eventEditor.segments.table.guests' | localize }}</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     @for (t of GuestTypes; track t) {
       <tr>
-        <td class="ee-seg__label">{{ t | titlecase }}</td>
+        <td class="ee-seg__label">{{ 'guestType.' + t | localize }}</td>
         <td>
           <input
             type="number"
@@ -41,13 +44,13 @@
 
 
       @if (remainingTypes().length !== 0) {
-      <button class="btn ee-seg__add" (click)="addSegment(e.id!)">➕ Add Segment</button>
+      <button class="btn ee-seg__add" (click)="addSegment(e.id!)">{{ 'eventEditor.segments.add' | localize }}</button>
       }
     </div>
 
     <!-- MIDDLE: Menu -->
     <div class="card ee-card">
-      <h3>Menu (per-dish popularity)</h3>
+      <h3>{{ 'eventEditor.menu.title' | localize }}</h3>
 
       @if (dishes$ | async; as dishes) {
       <ul class="ee-menu">
@@ -59,12 +62,12 @@
               [checked]="hasDish(d.id!)"
               (checkedChange)="toggleDish(e.id!, d.id!, $event)"
             />
-            <small class="muted">bpp: {{ bppOf(d.id!) }}</small>
+            <small class="muted">{{ 'eventEditor.menu.bpp' | localize }}: {{ bppOf(d.id!) }}</small>
           </div>
 
           @if (hasDish(d.id!)) {
           <div class="ee-menu__pop">
-            <span class="muted">Popularity</span>
+            <span class="muted">{{ 'eventEditor.menu.popularity' | localize }}</span>
             <input
               class="ee-range"
               type="range"
@@ -86,41 +89,41 @@
 
     <!-- RIGHT: Totals -->
     <aside class="card ee-card ee-col-right">
-      <h3>Totals</h3>
+      <h3>{{ 'eventEditor.totals.title' | localize }}</h3>
 
       <p>
-        Total guests:
+        {{ 'eventEditor.totals.totalGuests' | localize }}:
         <strong class="ee-accent">{{ totalGuests() }}</strong>
       </p>
 
-      <h4 class="ee-subtitle">Dish portions</h4>
+      <h4 class="ee-subtitle">{{ 'eventEditor.totals.dishPortions' | localize }}</h4>
       <ul class="ee-portions">
         @for (m of local.menu; track m.dishId) {
         <li class="ee-portions__row">
           <span class="ee-portions__name">{{ dishName(m.dishId) }}:</span>
           <span class="ee-portions__amt">
             {{ computePortions(m.dishId, localPopularity(m.dishId)) | number : '1.0-1' }}
-            <small class="muted">bpp: {{ bppOf(m.dishId) }}</small>
+            <small class="muted">({{ 'eventEditor.menu.bpp' | localize }}: {{ bppOf(m.dishId) }})</small>
           </span>
         </li>
         }
       </ul>
 
       <div class="ee-totalHdr">
-        <span>Total ingredients</span>
-        <button class="btn" (click)="recalcTotals()">↻ Recalculate</button>
+        <span>{{ 'eventEditor.totals.header.ingredients' | localize }}</span>
+        <button class="btn" (click)="recalcTotals()">{{ 'eventEditor.totals.recalculate' | localize }}</button>
       </div>
 
       @if (isCalcBusy) {
         <app-loader></app-loader>
       } @else if (!totals.length) {
-      <p class="muted">No ingredients to show yet.</p>
+      <p class="muted">{{ 'eventEditor.totals.empty' | localize }}</p>
       } @else {
       <table class="table ee-totalTbl">
         <thead>
           <tr>
-            <th>Ingredient</th>
-            <th class="ee-end">Amount</th>
+            <th>{{ 'eventEditor.totals.table.ingredient' | localize }}</th>
+            <th class="ee-end">{{ 'eventEditor.totals.table.amount' | localize }}</th>
           </tr>
         </thead>
         <tbody>
